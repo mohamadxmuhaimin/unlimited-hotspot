@@ -1,0 +1,50 @@
+:experimental:
+
+== Requirements
+* Magisk 22.1 (older versions not tested)
+* link:https://github.com/Magisk-Modules-Repo/MagiskHidePropsConf#installation[MagiskHide Props Config] module installed
+* A terminal emulator; either link:https://f-droid.org/en/packages/com.termux/[Termux] or link:https://f-droid.org/en/packages/com.termoneplus/[TermOnePlus]
+- Want to use Linux software? Install Termux.
+* AFWall+ 3.5.1 (older versions not tested)
+
+== Steps
+NOTE: ↵ is the kbd:[Enter / Return] key.
+
+. Launch a terminal emulator.
+- ``su``
+- ``props``
+** "Select an option below." (4 for "Add/edit custom props") kbd:[4 ↵]
+** Select "New custom prop" with kbd:[n ↵]
+*** `net.tethering.noprovisioning` kbd:[↵] -> kbd:[true ↵] -> kbd:[y ↵]
+** "Do you want to reboot now?" kbd:[n ↵]
+** Select "New custom prop" with kbd:[n ↵]
+*** `tether_dun_required` kbd:[↵] -> kbd:[0 ↵]
+** Select boot stage "post-fs-data" kbd:[2 ↵] -> kbd:[y ↵]
+***** "Do you want to reboot now?" -> kbd:[y ↵]
+
+. Open AFWall+ -> 3 vertical dots (hamburger menu) -> Preferences
+- UI Preferences
+** Confirm AFWall+ disable -> Enabled
+- Binaries
+** Iptables binary -> Built-in iptables
+** BusyBox binary -> Built-in BusyBox
+
+. Return to main AFWall+ screen -> 3 vertical dots -> Set custom script
+
+NOTE: Blanket setting \*rmnet* might be a bad idea? +
+rndis* is specific to USB tethering; \*rmnet* still has business with USB tethering, along with all other tether types.
+
+TIP: Put in "Enter custom script below".
+
+[source]
+----
+iptables -t mangle -A POSTROUTING -o wlan+ -j TTL --ttl-set 64
+ip6tables -t mangle -A POSTROUTING -o wlan+ -j HL --hl-set 64
+
+
+iptables -t mangle -A POSTROUTING -o +rmnet+ -j TTL --ttl-set 65
+iptables -t mangle -A POSTROUTING -o rndis+ -j TTL --ttl-set 65
+ip6tables -t mangle -A POSTROUTING -o +rmnet+ -j HL --hl-set 65
+ip6tables -t mangle -A POSTROUTING -o rndis+ -j HL --hl-set 65
+----
+

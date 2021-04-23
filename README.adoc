@@ -20,7 +20,7 @@ NOTE: Testing xt_HL support: +
 
 TIP: link:https://web.archive.org/web/20210423030541/https://forum.xda-developers.com/t/magisk-stock-bypass-tether-restrictions.4262265/[Good reference for enabling xt_HL support].
 
-== Steps
+== 1. Configure props
 NOTE: ↵ is the kbd:[Enter / Return] key.
 
 . Launch a terminal emulator.
@@ -35,7 +35,7 @@ NOTE: ↵ is the kbd:[Enter / Return] key.
 ** Select boot stage "post-fs-data" kbd:[2 ↵] -> kbd:[y ↵]
 *** "Do you want to reboot now?" -> kbd:[y ↵]
 
-
+== 2. Configure networking
 
 NOTE: "xt_HL.ko" method stops TTL problems for WiFi & Mobile connections; only changes TTL to 65 for Tethering since other devices subtract TTL by 1 to get the correct 64 TTL.
 

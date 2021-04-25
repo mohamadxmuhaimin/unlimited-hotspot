@@ -1,4 +1,5 @@
 :experimental:
+:imagesdir: imgs
 
 WARNING: This is not complete, despite the instructions working. I have ideas on how to improve this.
 
@@ -10,7 +11,15 @@ WARNING: This is not complete, despite the instructions working. I have ideas on
 * AFWall+ 3.5.1 (older versions not tested)
 
 == Optional requirements
-*  Kernel with "xt_HL.ko" module enabled; netfilter's TTL packet mangling.
+*  Kernel with "xt_HL.ko" module enabled; netfilter's TTL packet mangling
+* Busybox Magisk module
+
+.Installing Busybox Magisk module
+[%collapsible]
+====
+. image:MV1iA.png[]
+. Search for 'Busybox' to find "Busybox for Android NDK", then install it.
+====
 
 NOTE: Testing xt_HL support: +
 1. Launch a terminal emulator. +
@@ -18,22 +27,27 @@ NOTE: Testing xt_HL support: +
 3. ``iptables --ttl-set`` +
 -> If your custom kernel does not support "--ttl-set", inform them of this repository publically (increase exposure of these instructions).
 
-TIP: link:https://web.archive.org/web/20210423030541/https://forum.xda-developers.com/t/magisk-stock-bypass-tether-restrictions.4262265/[Good reference for enabling xt_HL support].
+TIP: link:https://web.archive.org/web/20210423030541/https://forum.xda-developers.com/t/magisk-stock-bypass-tether-restrictions.4262265/[A reference for enabling xt_HL support through Magisk].
 
 == 1. Configure props
 NOTE: ↵ is the kbd:[Enter / Return] key.
 
 . Launch a terminal emulator.
 - ``su``
+
+NOTE: This is a precaution; likely useless.
+
+- ``settings delete system tether_entitlement_check_state;settings delete global tether_dun_required``
 - ``props``
 ** "Select an option below." (4 for "Add/edit custom props") kbd:[4 ↵]
 ** Select "New custom prop" with kbd:[n ↵]
 *** `net.tethering.noprovisioning` kbd:[↵] -> kbd:[true ↵] -> kbd:[y ↵]
 ** "Do you want to reboot now?" kbd:[n ↵]
 ** Select "New custom prop" with kbd:[n ↵]
-*** `tether_dun_required` kbd:[↵] -> kbd:[0 ↵]
-** Select boot stage "post-fs-data" kbd:[2 ↵] -> kbd:[y ↵]
-*** "Do you want to reboot now?" -> kbd:[y ↵]
+*** `tether_entitlement_check_state` kbd:[↵] -> kbd:[0 ↵] -> kbd:[y ↵]
+** Select "New custom prop" with kbd:[n ↵]
+*** `tether_dun_required` kbd:[↵] -> kbd:[0 ↵] -> kbd:[y ↵]
+***** "Do you want to reboot now?" -> kbd:[y ↵]
 
 == 2. Configure networking
 
@@ -46,10 +60,10 @@ NOTE: "xt_HL.ko" method stops TTL problems for WiFi & Mobile connections; only c
 - UI Preferences
 ** Confirm AFWall+ disable -> Enabled
 - Binaries
-** Iptables binary -> Built-in iptables
-** BusyBox binary -> Built-in BusyBox
+** Iptables binary -> System iptables
+** **[optional]** BusyBox binary -> System BusyBox
 
-. Return to main AFWall+ screen -> 3 vertical dots -> Set custom script
+* Open AFWall+ -> 3 vertical dots (hamburger menu) -> Set custom script
 
 NOTE: Blanket setting \*rmnet* might be a bad idea? +
 rndis* is specific to USB tethering; \*rmnet* still has business with USB tethering, along with all other tether types.

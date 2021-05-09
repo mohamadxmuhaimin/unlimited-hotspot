@@ -77,8 +77,8 @@ ip6tables -t mangle -A POSTROUTING -o rndis+ -j HL --hl-set 64
 
 == 3. Test for TTL 64 (desired) on the tethered device
 * Windows:
-- IPv4/iptables: `ping -4 www.test-ipv6.com`
-- IPv6/ip6tables: `ping -6 www.test-ipv6.com`
+- IPv4/iptables: `ping -4 gnu.org`
+- IPv6/ip6tables: `ping -6 gnu.org`
 
 If the TTL & HL is 64, you've successfully completed this guide.
 

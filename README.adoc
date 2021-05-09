@@ -24,21 +24,18 @@ WARNING: This is not complete, despite the instructions working. I have ideas on
 NOTE: Testing xt_HL support: +
 1. Launch a terminal emulator. +
 2. ``su`` +
-3. ``iptables --ttl-set`` +
--> If your custom kernel does not support "--ttl-set", inform them of this repository publically (increase exposure of these instructions).
+3. ``iptables -t mangle -A POSTROUTING -o wlan+ -j TTL --ttl-set 64;ip6tables -t mangle -A POSTROUTING -o wlan+ -j HL --hl-set 64`` +
+-> If your custom kernel does not support "--ttl-set" and/or "--hl-set", inform them of this repository publicly (to increase exposure of these instructions).
 
-TIP: link:https://web.archive.org/web/20210423030541/https://forum.xda-developers.com/t/magisk-stock-bypass-tether-restrictions.4262265/[A reference for enabling xt_HL support through Magisk].
+TIP: For kernel tweakers: link:https://web.archive.org/web/20210423030541/https://forum.xda-developers.com/t/magisk-stock-bypass-tether-restrictions.4262265/[A reference for enabling xt_HL support through Magisk].
 
 == 1. Configure props
 NOTE: ↵ is the kbd:[Enter / Return] key.
 
 . Launch a terminal emulator.
-- ``su``
-
-NOTE: This is a precaution; likely useless.
-
-- ``settings delete system tether_entitlement_check_state;settings delete global tether_dun_required``
-- ``props``
+. ``su``
+. ``settings delete system tether_entitlement_check_state;settings delete global tether_dun_required``
+. ``props``
 ** "Select an option below." (4 for "Add/edit custom props") kbd:[4 ↵]
 ** Select "New custom prop" with kbd:[n ↵]
 *** `net.tethering.noprovisioning` kbd:[↵] -> kbd:[true ↵] -> kbd:[y ↵]
@@ -49,11 +46,9 @@ NOTE: This is a precaution; likely useless.
 *** `tether_dun_required` kbd:[↵] -> kbd:[0 ↵] -> kbd:[y ↵]
 ***** "Do you want to reboot now?" -> kbd:[y ↵]
 
-== 2. Configure networking
+== 2. Adjust TTL & HL
 
-NOTE: "xt_HL.ko" method stops TTL problems for WiFi & Mobile connections; only changes TTL to 65 for Tethering since other devices subtract TTL by 1 to get the correct 64 TTL.
-
-."xt_HL.ko" required method
+."xt_HL.ko" required method (adding network tables rules; the best method)
 [%collapsible]
 ====
 . Open AFWall+ -> 3 vertical dots (hamburger menu) -> Preferences
@@ -72,13 +67,19 @@ TIP: Put in "Enter custom script below".
 
 [source]
 ----
-iptables -t mangle -A POSTROUTING -o wlan+ -j TTL --ttl-set 64
-ip6tables -t mangle -A POSTROUTING -o wlan+ -j HL --hl-set 64
-
-iptables -t mangle -A POSTROUTING -o +rmnet+ -j TTL --ttl-set 65
-iptables -t mangle -A POSTROUTING -o rndis+ -j TTL --ttl-set 65
-ip6tables -t mangle -A POSTROUTING -o +rmnet+ -j HL --hl-set 65
-ip6tables -t mangle -A POSTROUTING -o rndis+ -j HL --hl-set 65
+iptables -t mangle -A POSTROUTING -o +rmnet+ -j TTL --ttl-set 64
+iptables -t mangle -A POSTROUTING -o rndis+ -j TTL --ttl-set 64
+ip6tables -t mangle -A POSTROUTING -o +rmnet+ -j HL --hl-set 64
+ip6tables -t mangle -A POSTROUTING -o rndis+ -j HL --hl-set 64
 ----
+
 ====
 
+== 3. Test for TTL 64 (desired) on the tethered device
+* Windows:
+- IPv4/iptables: `ping -4 www.test-ipv6.com`
+- IPv6/ip6tables: `ping -6 www.test-ipv6.com`
+
+If the TTL & HL is 64, you've successfully completed this guide.
+
+If this helped you, spread this guide around; I hate seeing crappy guides at the top of Search Engine results.

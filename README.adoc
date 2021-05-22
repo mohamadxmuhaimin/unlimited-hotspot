@@ -1,8 +1,6 @@
 :experimental:
 :imagesdir: imgs
 
-WARNING: This is not complete, despite the instructions working. I have ideas on how to improve this.
-
 == Requirements
 * Magisk 22.1 (older versions not tested)
 * link:https://github.com/Magisk-Modules-Repo/MagiskHidePropsConf#installation[MagiskHide Props Config] module installed
@@ -10,7 +8,7 @@ WARNING: This is not complete, despite the instructions working. I have ideas on
 - Want to use Linux software? Install Termux.
 * AFWall+ 3.5.1 (older versions not tested)
 
-== Optional requirements
+== Optional (recommended) requirements
 *  Kernel with "xt_HL.ko" module enabled; netfilter's TTL packet mangling
 * Busybox Magisk module
 

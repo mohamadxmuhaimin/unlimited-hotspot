@@ -1,15 +1,30 @@
 :experimental:
 :imagesdir: imgs
+:icons:
+ifdef::env-github[]
+:tip-caption: :bulb:
+:note-caption: :information_source:
+:important-caption: :heavy_exclamation_mark:
+:caution-caption: :fire:
+:warning-caption: :warning:
+endif::[]
 
 == Requirements
-* Magisk 22.1 (older versions not tested)
+* Magisk; link:https://github.com/ghost-420/Best-way-to-flash-Magisk[installing Magisk (my guide, cause the others sucked)]
 * link:https://github.com/Magisk-Modules-Repo/MagiskHidePropsConf#installation[MagiskHide Props Config] module installed
-* A terminal emulator; either link:https://f-droid.org/en/packages/com.termux/[Termux] or link:https://f-droid.org/en/packages/com.termoneplus/[TermOnePlus]
-- Want to use Linux software? Install Termux.
-* AFWall+ 3.5.1 (older versions not tested)
+* A terminal emulator; the built-in (LineageOS) or link:https://f-droid.org/en/packages/com.termoneplus/[TermOnePlus] work fine
+- Want to use Linux software? Install link:https://f-droid.org/en/packages/com.termux/[Termux]
+* link:https://f-droid.org/en/packages/dev.ukanth.ufirewall/[AFWall+ from **only** F-Droid]
 
-== Optional (recommended) requirements
-*  Kernel with "xt_HL.ko" module enabled; netfilter's TTL packet mangling
+== Recommended/optional
+* Kernel with "xt_HL.ko" module enabled; netfilter's TTL packet mangling
+
+.Compatible kernel list for Google's Pixel 4a 5G/Pixel 5
+[%collapsible]
+====
+* https://github.com/kdrag0n/proton_kernel_redbull/releases
+====
+
 * Busybox Magisk module
 
 .Installing Busybox Magisk module
@@ -80,4 +95,4 @@ ip6tables -t mangle -A POSTROUTING -o rndis+ -j HL --hl-set 64
 
 If the TTL & HL is 64, you've successfully completed this guide.
 
-If this helped you, spread this guide around; I hate seeing crappy guides at the top of Search Engine results.
+TIP: If this works, then Star this repository!

@@ -14,16 +14,13 @@ endif::[]
 * link:https://github.com/Magisk-Modules-Repo/MagiskHidePropsConf#installation[MagiskHide Props Config] module installed
 * A terminal emulator; the built-in (LineageOS) or link:https://f-droid.org/en/packages/com.termoneplus/[TermOnePlus] work fine
 - Want to use Linux software? Install link:https://f-droid.org/en/packages/com.termux/[Termux]
-* link:https://f-droid.org/en/packages/dev.ukanth.ufirewall/[AFWall+ from **only** F-Droid]
+* link:https://f-droid.org/en/packages/dev.ukanth.ufirewall/[AFWall+ from F-Droid]
 
 == Recommended/optional
-* Kernel with "xt_HL.ko" module enabled; netfilter's TTL packet mangling
-
-.Compatible kernel list for Google's Pixel 4a 5G/Pixel 5
-[%collapsible]
-====
-* https://github.com/kdrag0n/proton_kernel_redbull/releases
-====
+* link:https://play.google.com/store/apps/details?id=com.draco.ktweak[KTweak for higher network speeds], using its 'latency' profile.
+* Kernel with the "xt_HL.ko" module (netfilter's TTL packet mangling) enabled
+** Known kernels with support:
+*** kdrag0n's link:https://github.com/kdrag0n/proton_kernel_redbull[ProtonKernel] for Pixel 4A 5G/Pixel 5
 
 * Busybox Magisk module
 
@@ -61,7 +58,7 @@ NOTE: ↵ is the kbd:[Enter / Return] key.
 
 == 2. Adjust TTL & HL
 
-."xt_HL.ko" required method (adding network tables rules; the best method)
+.Best method; "xt_HL.ko" support required
 [%collapsible]
 ====
 . Open AFWall+ -> 3 vertical dots (hamburger menu) -> Preferences
@@ -73,8 +70,10 @@ NOTE: ↵ is the kbd:[Enter / Return] key.
 
 * Open AFWall+ -> 3 vertical dots (hamburger menu) -> Set custom script
 
-NOTE: Blanket setting \*rmnet* might be a bad idea? +
+////
+Blanket setting \*rmnet* might be a bad idea? +
 rndis* is specific to USB tethering; \*rmnet* still has business with USB tethering, along with all other tether types.
+////
 
 TIP: Put in "Enter custom script below".
 

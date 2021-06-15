@@ -61,6 +61,8 @@ NOTE: ↵ is the kbd:[Enter / Return] key.
 . Check "Apply to all network interfaces using /proc"
 . Press OK to the side of "Set new TTL" to apply a chosen TTL
 
+NOTE: This has to be manually applied on every boot (when you wish to tether)
+
 ___
 ====
 
@@ -86,7 +88,7 @@ ip6tables -t mangle -A POSTROUTING -o rndis+ -j HL --hl-set 64
 ----
 
 == 3. Test TTL & HL change on the tethered device
-TIP: kbd:[CTRL C] to stop pinging at any time
+NOTE: kbd:[CTRL C] to stop pinging at any time
 
 * IPv4/iptables: `ping -4 gnu.org`
 * IPv6/ip6tables: `ping -6 gnu.org`

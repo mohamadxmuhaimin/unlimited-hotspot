@@ -1,5 +1,4 @@
 :experimental:
-:imagesdir: imgs
 :icons:
 ifdef::env-github[]
 :tip-caption: :bulb:
@@ -10,73 +9,74 @@ ifdef::env-github[]
 endif::[]
 
 == Requirements
-* Magisk; link:https://github.com/ghost-420/Best-way-to-flash-Magisk[installing Magisk (my guide, cause the others sucked)]
+* Magisk; link:https://github.com/ghost-420/Best-way-to-flash-Magisk[installing Magisk (my guide; others sucked)]
 * link:https://github.com/Magisk-Modules-Repo/MagiskHidePropsConf#installation[MagiskHide Props Config] module installed
-* A terminal emulator; the built-in (LineageOS) or link:https://f-droid.org/en/packages/com.termoneplus/[TermOnePlus] work fine
-- Want to use Linux software? Install link:https://f-droid.org/en/packages/com.termux/[Termux]
+* The link:https://f-droid.org/en/packages/com.termux/[Termux] terminal emulator (link:https://wiki.termux.com/wiki/Termux_Google_Play[from F-Droid only])
 * link:https://f-droid.org/en/packages/dev.ukanth.ufirewall/[AFWall+ from F-Droid]
+
+* Install Busybox Magisk module
+. Magisk -> Modules (puzzle piece icon)
+. Search for 'busybox' to find "Busybox for Android NDK", then install it
 
 == Recommended/optional
 * link:https://play.google.com/store/apps/details?id=com.draco.ktweak[KTweak for higher network speeds], using its 'latency' profile.
 * Kernel with the "xt_HL.ko" module (netfilter's TTL packet mangling) enabled
 ** Known kernels with support:
-*** kdrag0n's link:https://github.com/kdrag0n/proton_kernel_redbull[ProtonKernel] for Pixel 4A 5G/Pixel 5
+*** kdrag0n's link:https://github.com/kdrag0n/proton_kernel_redbull[ProtonKernel] for Pixel 4a 5G/Pixel 5
 
-* Busybox Magisk module
-
-.Installing Busybox Magisk module
-[%collapsible]
-====
-. image:MV1iA.png[]
-. Search for 'Busybox' to find "Busybox for Android NDK", then install it.
-====
-
-NOTE: Testing xt_HL support: +
-1. Launch a terminal emulator. +
+NOTE: Testing "xt_HL.ko" support: +
+1. Launch Termux +
 2. ``su`` +
-3. ``iptables -t mangle -A POSTROUTING -o wlan+ -j TTL --ttl-set 64;ip6tables -t mangle -A POSTROUTING -o wlan+ -j HL --hl-set 64`` +
--> If your custom kernel does not support "--ttl-set" and/or "--hl-set", inform them of this repository publicly (to increase exposure of these instructions).
+3. ``iptables -t mangle -A POSTROUTING -o wlan+ -j TTL --ttl-set 64;ip6tables -t mangle -A POSTROUTING -o wlan+ -j HL --hl-set 64``
 
-TIP: For kernel tweakers: link:https://web.archive.org/web/20210423030541/https://forum.xda-developers.com/t/magisk-stock-bypass-tether-restrictions.4262265/[A reference for enabling xt_HL support through Magisk].
+TIP: -> If your custom kernel does not support `--ttl-set` and `--hl-set`, inform them of this repository publicly (to increase exposure of these instructions). +
+ For kernel tweakers: link:https://web.archive.org/web/20210423030541/https://forum.xda-developers.com/t/magisk-stock-bypass-tether-restrictions.4262265/[A reference for enabling "xt_HL.ko" support through Magisk].
 
 == 1. Configure props
 NOTE: ↵ is the kbd:[Enter / Return] key.
 
-. Launch a terminal emulator.
+. Launch Termux.
 . ``su``
 . ``settings delete system tether_entitlement_check_state;settings delete global tether_dun_required``
 . ``props``
-** "Select an option below." (4 for "Add/edit custom props") kbd:[4 ↵]
+** "Select an option below." -> "Add/edit custom props" kbd:[4 ↵]
 ** Select "New custom prop" with kbd:[n ↵]
 *** `net.tethering.noprovisioning` kbd:[↵] -> kbd:[true ↵] -> kbd:[y ↵]
-** "Do you want to reboot now?" kbd:[n ↵]
+**** "Do you want to reboot now?" kbd:[n ↵]
 ** Select "New custom prop" with kbd:[n ↵]
 *** `tether_entitlement_check_state` kbd:[↵] -> kbd:[0 ↵] -> kbd:[y ↵]
+**** "Do you want to reboot now?" kbd:[n ↵]
 ** Select "New custom prop" with kbd:[n ↵]
 *** `tether_dun_required` kbd:[↵] -> kbd:[0 ↵] -> kbd:[y ↵]
-***** "Do you want to reboot now?" -> kbd:[y ↵]
+**** "Do you want to reboot now?" -> kbd:[y ↵]
 
 == 2. Adjust TTL & HL
 
-.Best method; "xt_HL.ko" support required
+.Alternative method for kernels with no "xt_HL.ko" support
 [%collapsible]
 ====
+
+. Download link:https://play.google.com/store/apps/details?id=org.segin.ttleditor[TTL Editor] from the Google Play Store, which can be downloaded through link:https://gitlab.com/AuroraOSS/AuroraStore/-/releases[Aurora Store].
+. Open TTL Editor
+. Check "Apply to all network interfaces using /proc"
+. Press OK to the side of "Set new TTL" to apply a chosen TTL
+
+___
+====
+
 . Open AFWall+ -> 3 vertical dots (hamburger menu) -> Preferences
 - UI Preferences
 ** Confirm AFWall+ disable -> Enabled
 - Binaries
 ** Iptables binary -> System iptables
-** **[optional]** BusyBox binary -> System BusyBox
-
-* Open AFWall+ -> 3 vertical dots (hamburger menu) -> Set custom script
+** BusyBox binary -> System BusyBox
+. Open AFWall+ -> 3 vertical dots (hamburger menu) -> Set custom script
+. Put in "Enter custom script below"
 
 ////
 Blanket setting \*rmnet* might be a bad idea? +
 rndis* is specific to USB tethering; \*rmnet* still has business with USB tethering, along with all other tether types.
 ////
-
-TIP: Put in "Enter custom script below".
-
 [source]
 ----
 iptables -t mangle -A POSTROUTING -o +rmnet+ -j TTL --ttl-set 64
@@ -85,12 +85,11 @@ ip6tables -t mangle -A POSTROUTING -o +rmnet+ -j HL --hl-set 64
 ip6tables -t mangle -A POSTROUTING -o rndis+ -j HL --hl-set 64
 ----
 
-====
+== 3. Test TTL & HL change on the tethered device
+TIP: kbd:[CTRL C] to stop pinging at any time
 
-== 3. Test for TTL 64 (desired) on the tethered device
-* Windows:
-- IPv4/iptables: `ping -4 gnu.org`
-- IPv6/ip6tables: `ping -6 gnu.org`
+* IPv4/iptables: `ping -4 gnu.org`
+* IPv6/ip6tables: `ping -6 gnu.org`
 
 If the TTL & HL is 64, you've successfully completed this guide.
 

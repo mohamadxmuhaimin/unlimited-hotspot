@@ -1,6 +1,6 @@
 :experimental:
-:icons:
 ifdef::env-github[]
+:icons:
 :tip-caption: :bulb:
 :note-caption: :information_source:
 :important-caption: :heavy_exclamation_mark:
@@ -9,7 +9,7 @@ ifdef::env-github[]
 endif::[]
 
 == Requirements
-* Magisk; link:https://github.com/ghost-420/Best-way-to-flash-Magisk[installing Magisk (my guide; others sucked)]
+* Magisk; link:https://github.com/ghost-420/Ez_Magisk[installing Magisk (via recovery)]
 * link:https://github.com/Magisk-Modules-Repo/MagiskHidePropsConf#installation[MagiskHide Props Config] module installed
 * The link:https://f-droid.org/en/packages/com.termux/[Termux] terminal emulator (link:https://wiki.termux.com/wiki/Termux_Google_Play[from F-Droid only])
 * link:https://f-droid.org/en/packages/dev.ukanth.ufirewall/[AFWall+ from F-Droid]
@@ -19,7 +19,7 @@ endif::[]
 . Search for 'busybox' to find "Busybox for Android NDK", then install it
 
 == Recommended/optional
-* link:https://play.google.com/store/apps/details?id=com.draco.ktweak[KTweak for higher network speeds], using its 'latency' profile.
+* link:https://play.google.com/store/apps/details?id=com.draco.ktweak[KTweak for higher network speeds], using its 'throughput' profile.
 * Kernel with the "xt_HL.ko" module (netfilter's TTL packet mangling) enabled
 ** Known kernels with support:
 *** kdrag0n's link:https://github.com/kdrag0n/proton_kernel_redbull[ProtonKernel] for Pixel 4a 5G/Pixel 5

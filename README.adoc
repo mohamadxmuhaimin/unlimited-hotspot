@@ -13,9 +13,15 @@ Artifical restrictions placed on tethering make it difficult to work from home f
 
 * Your mobile provider cannot:
 ** Entirely prove this method (link:https://github.com/RiFi2k/unlimited-tethering[among some others]) is being used
-* Your mobile provider can (if no VPN is used):
+* Your mobile provider can (if no VPN, or Tor, or I2P, or proxy is used):
 ** Check for specific domains being connected to that only a Windows PC would connect to, but not an Android phone, to assume the current month is all tethered traffic
 ** Using link:https://en.wikipedia.org/wiki/Deep_packet_inspection[DPI software], traffic can be shaped/tampered/manipulated/throttled based on certain criteria(s), such as Video Streaming (making YouTube videos or Netflix buffer more, some like T-Mobile force lower video quality)
+
+A paid VPN is recommended since it's easy to route all traffic through it, and shouldn't reduce speeds
+
+WARNING: VPNs don't grant privacy, Tor and I2P do +
+For this guide, VPNs are used for the intention of hiding traffic from your mobile provider, and ensuring web content isn't blocked +
+*`Ultimately, usage of a VPN is optional`*
 
 ___
 .Good paid VPN providers do the following:

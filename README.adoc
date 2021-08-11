@@ -11,8 +11,32 @@ endif::[]
 == About
 Artifical restrictions placed on tethering make it difficult to work from home for those not fortunate to have a high-speed ISP
 
-* Your mobile provider cannot prove this method (link:https://github.com/RiFi2k/unlimited-tethering[among some others]) is being used, since it's thorough with getting around their checks
-* Your mobile provider can speculate based on data usage patterns (especially if no VPN is used), so use lots of data at your own risk
+* Your mobile provider cannot:
+** Entirely prove this method (link:https://github.com/RiFi2k/unlimited-tethering[among some others]) is being used
+* Your mobile provider can (if no VPN is used):
+** Check for specific domains being connected to that only a Windows PC would connect to, but not an Android phone, to assume the current month is all tethered traffic
+** Using link:https://en.wikipedia.org/wiki/Deep_packet_inspection[DPI software], traffic can be shaped/tampered/manipulated/throttled based on certain criteria(s), such as Video Streaming (making YouTube videos or Netflix buffer more, some like T-Mobile force lower video quality)
+
+___
+.Good paid VPN providers do the following:
+* Transparent communication, and all software used is open-source
+* Use only dedicated/physical servers (faster and more secure than virtual servers, called "VPS" or "VDS")
+* Servers are only located in countries with lots of transit capability (for South America, is only Brazil)
+* No fake server locations (unless for streaming purposes on specific domains/websites, and is stated as such)
+* All server locations allow all forms of traffic except outbound port 25 (to prevent email spam abuse) 
+* Word of mouth advertising; not shoved in your face by sponsored YouTube videos and Google Ads
+* VPN's company is not based in a tax haven country; tax haven = profitability is heavily considered, meaning they'd likely sell your data to earn more profit
+
+For your own research, avoid all websites recommending VPNs under the parent company "Kape Technologies": https://restoreprivacy.com/private-internet-access-kape-crossrider/
+
+* Recommendations:
+. link:https://airvpn.org[AirVPN] | link:https://airvpn.dev[AirVPN #2] | link:http://airvpn3epnw2fnsbx5x2ppzjs6vxtdarldas7wjyqvhscj7x43fxylqd.onion[AirVPN via Tor]
+. link:https://mullvad.net[Mullvad] | link:http://o54hon2e2vj6c7m3aqqu6uyece65by3vgoxxhlqlsvkmacw6a7m7kiad.onion[Mullvad via Tor]
+. link:https://www.ovpn.com[OVPN]
+
+TIP: Trust-worthy free VPN providers, but have slow network speeds: +
+1. link:https://riseup.net/en/vpn[Riseup] | link:http://vww6ybal4bd7szmgncyruucpgfkqahzddi37ktceo3ah7ngmcopnpyyd.onion/en/vpn[Riseup via Tor] +
+2. link:https://cryptostorm.is/wireguard[Cryptostorm] | link:http://kzaeunogz6s75ptgy6ifjzwwy75xdfenenswvrczd7mewxgrad5a.b32.i2p/[Cryptostorm via I2P] (I2P > Tor when available) | link:http://stormwayszuh4juycoy4kwoww5gvcu2c4tdtpkup667pdwe4qenzwayd.onion/wireguard[Cryptostorm via Tor]
 
 == Requirements
 * Magisk, and by that accord *root*; link:https://github.com/ghost-420/Ez_Magisk[installing Magisk (via recovery)]
@@ -25,6 +49,7 @@ Artifical restrictions placed on tethering make it difficult to work from home f
 . Search for 'busybox' to find "Busybox for Android NDK", then install it
 
 == Recommended/optional
+* Access to a VPN provider that respects its users (no traffic shaping)
 * Google Play Store, alternatively through link:https://gitlab.com/AuroraOSS/AuroraStore/-/releases[Aurora Store]
 * link:https://play.google.com/store/apps/details?id=com.draco.ktweak[KTweak for higher network speeds], using its 'throughput' profile
 * Kernel with the "xt_HL.ko" module (netfilter's TTL packet mangling) enabled

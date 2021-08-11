@@ -11,8 +11,8 @@ endif::[]
 == About
 Artifical restrictions placed on tethering make it difficult to work from home for those not fortunate to have a high-speed ISP
 
-Your mobile provider cannot prove this method (link:https://github.com/RiFi2k/unlimited-tethering[among some others]) is being used, since it's thorough with getting around their checks + 
-Your mobile provider can speculate based on data usage patterns (especially if no VPN is used), so use lots of data at your own risk
+* Your mobile provider cannot prove this method (link:https://github.com/RiFi2k/unlimited-tethering[among some others]) is being used, since it's thorough with getting around their checks
+* Your mobile provider can speculate based on data usage patterns (especially if no VPN is used), so use lots of data at your own risk
 
 == Requirements
 * Magisk, and by that accord *root*; link:https://github.com/ghost-420/Ez_Magisk[installing Magisk (via recovery)]

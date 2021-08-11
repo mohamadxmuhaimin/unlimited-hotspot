@@ -9,7 +9,7 @@ ifdef::env-github[]
 endif::[]
 
 == Requirements
-* Magisk; link:https://github.com/ghost-420/Ez_Magisk[installing Magisk (via recovery)]
+* Magisk, and by that accord *root*; link:https://github.com/ghost-420/Ez_Magisk[installing Magisk (via recovery)]
 * link:https://github.com/Magisk-Modules-Repo/MagiskHidePropsConf#installation[MagiskHide Props Config] module installed
 * The link:https://f-droid.org/en/packages/com.termux/[Termux] terminal emulator (link:https://wiki.termux.com/wiki/Termux_Google_Play[from F-Droid only])
 * link:https://f-droid.org/en/packages/dev.ukanth.ufirewall/[AFWall+ from F-Droid]
@@ -19,23 +19,33 @@ endif::[]
 . Search for 'busybox' to find "Busybox for Android NDK", then install it
 
 == Recommended/optional
-* link:https://play.google.com/store/apps/details?id=com.draco.ktweak[KTweak for higher network speeds], using its 'throughput' profile.
+* Google Play Store, alternatively through link:https://gitlab.com/AuroraOSS/AuroraStore/-/releases[Aurora Store]
+* link:https://play.google.com/store/apps/details?id=com.draco.ktweak[KTweak for higher network speeds], using its 'throughput' profile
 * Kernel with the "xt_HL.ko" module (netfilter's TTL packet mangling) enabled
-** Known kernels with support:
-*** kdrag0n's link:https://github.com/kdrag0n/proton_kernel_redbull[ProtonKernel] for Pixel 4a 5G/Pixel 5
+** Known kernels with support (and seem high-quality):
+*** Freak07's link:https://forum.xda-developers.com/t/kernel-23-07-2021-android-11-kirisakura-1-1-8-for-asus-zenfone-8-aka-sake.4295287/[Kirisakura] for ASUS ZenFone 8
+*** kdrag0n's link:https://forum.xda-developers.com/t/kernel-pixel-5-proton-kernel.4194683/[ProtonKernel] for Pixel 4a 5G/Pixel 5
+*** kristofpetho's link:https://forum.xda-developers.com/t/kernel-oos-omega-kernel-oos11-august-7-2021.4271027/[Omega Kernel] for OnePlus 9 Pro
+
+TIP: Search terms to use on XDA Forums to find other kernels with "xt_HL.ko" support: +
+TTL spoofing +
+TTL target +
+IPtables TTL +
+TTL/HL target +
+TTL module +
 
 NOTE: Testing "xt_HL.ko" support: +
 1. Launch Termux +
 2. ``su`` +
 3. ``iptables -t mangle -A POSTROUTING -o wlan+ -j TTL --ttl-set 64;ip6tables -t mangle -A POSTROUTING -o wlan+ -j HL --hl-set 64``
 
-TIP: -> If your custom kernel does not support `--ttl-set` and `--hl-set`, inform them of this repository publicly (to increase exposure of these instructions). +
- For kernel tweakers: link:https://web.archive.org/web/20210423030541/https://forum.xda-developers.com/t/magisk-stock-bypass-tether-restrictions.4262265/[A reference for enabling "xt_HL.ko" support through Magisk].
+TIP: -> If your custom kernel does not support `--ttl-set` and `--hl-set`, inform them of this repository publicly (to increase exposure of these instructions) +
+ For kernel tweakers: link:https://web.archive.org/web/20210423030541/https://forum.xda-developers.com/t/magisk-stock-bypass-tether-restrictions.4262265/[an aid with enabling "xt_HL.ko" support through Magisk]
 
 == 1. Configure props
-NOTE: ↵ is the kbd:[Enter / Return] key.
+NOTE: ↵ is the kbd:[Enter / Return] key
 
-. Launch Termux.
+. Launch Termux
 . ``su``
 . ``settings delete system tether_entitlement_check_state;settings delete global tether_dun_required``
 . ``props``
@@ -56,12 +66,12 @@ NOTE: ↵ is the kbd:[Enter / Return] key.
 [%collapsible]
 ====
 
-. Download link:https://play.google.com/store/apps/details?id=org.segin.ttleditor[TTL Editor] from the Google Play Store, which can be downloaded through link:https://gitlab.com/AuroraOSS/AuroraStore/-/releases[Aurora Store].
+. Install link:https://play.google.com/store/apps/details?id=org.segin.ttleditor[TTL Editor]
 . Open TTL Editor
 . Check "Apply to all network interfaces using /proc"
-. Press OK to the side of "Set new TTL" to apply a chosen TTL
+. Press OK to the side of "Set new TTL" to apply a chosen TTL, likely 64
 
-NOTE: This has to be manually applied on every boot (when you wish to tether)
+NOTE: TTL changes reset on reboot/shut down/boot with this method
 
 ___
 ====
@@ -77,7 +87,7 @@ ___
 
 ////
 Blanket setting \*rmnet* might be a bad idea? +
-rndis* is specific to USB tethering; \*rmnet* still has business with USB tethering, along with all other tether types.
+rndis* is specific to USB tethering; \*rmnet* still has business with USB tethering, along with all other tether types
 ////
 [source]
 ----
@@ -90,9 +100,11 @@ ip6tables -t mangle -A POSTROUTING -o rndis+ -j HL --hl-set 64
 == 3. Test TTL & HL change on the tethered device
 NOTE: kbd:[CTRL C] to stop pinging at any time
 
-* IPv4/iptables: `ping -4 gnu.org`
-* IPv6/ip6tables: `ping -6 gnu.org`
+* IPv4/TTL/iptables: `ping -4 gnu.org`
+* IPv6/HL/ip6tables: `ping -6 gnu.org`
 
-If the TTL & HL is 64, you've successfully completed this guide.
+If the TTL & HL is 64, you've successfully completed this guide
 
 TIP: If this works, then Star this repository!
+
+NOTE: If this didn't work, try link:https://github.com/RiFi2k/unlimited-tethering[RiFi2k's method]

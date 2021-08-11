@@ -19,7 +19,7 @@ Artifical restrictions placed on tethering make it difficult to work from home f
 
 A paid VPN is recommended since it's easy to route all traffic through it, and shouldn't reduce speeds
 
-WARNING: VPNs don't grant privacy, Tor and I2P do +
+WARNING: VPNs don't grant privacy, Tor and I2P do; these can easily be used alongside a VPN if desired +
 For this guide, VPNs are used for the intention of hiding traffic from your mobile provider, and ensuring web content isn't blocked +
 *`Ultimately, usage of a VPN is optional`*
 
@@ -38,6 +38,7 @@ For your own research, avoid all websites recommending VPNs under the parent com
 * Recommendations:
 . link:https://airvpn.org[AirVPN] | link:https://airvpn.dev[AirVPN #2] | link:http://airvpn3epnw2fnsbx5x2ppzjs6vxtdarldas7wjyqvhscj7x43fxylqd.onion[AirVPN via Tor]
 . link:https://mullvad.net[Mullvad] | link:http://o54hon2e2vj6c7m3aqqu6uyece65by3vgoxxhlqlsvkmacw6a7m7kiad.onion[Mullvad via Tor]
+. Cryptostorm (best at bypassing VPN blocking; link:https://archive.is/6LyZf["port striping"] is one of the reasons why)
 . link:https://www.ovpn.com[OVPN]
 
 TIP: Trust-worthy free VPN providers, but have slow network speeds: +

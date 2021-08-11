@@ -39,7 +39,7 @@ For your own research, avoid all websites recommending VPNs under the parent com
 * Recommendations:
 . link:https://airvpn.org[AirVPN] | link:https://airvpn.dev[AirVPN #2] | link:http://airvpn3epnw2fnsbx5x2ppzjs6vxtdarldas7wjyqvhscj7x43fxylqd.onion[AirVPN via Tor]
 . link:https://mullvad.net[Mullvad] | link:http://o54hon2e2vj6c7m3aqqu6uyece65by3vgoxxhlqlsvkmacw6a7m7kiad.onion[Mullvad via Tor]
-. Cryptostorm (best at bypassing VPN blocking due to competitors not having the "port striping" feature, which is link:https://archive.is/6LyZf[documented] on how it's done
+. Cryptostorm (best at bypassing VPN blocking due to competitors not having the "port striping" feature, which is link:https://archive.is/6LyZf[documented] on how it's done)
 . link:https://www.ovpn.com[OVPN]
 
 TIP: Trust-worthy free VPN providers, but have slow network speeds: +

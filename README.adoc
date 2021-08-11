@@ -8,6 +8,12 @@ ifdef::env-github[]
 :warning-caption: :warning:
 endif::[]
 
+== About
+Artifical restrictions placed on tethering make it difficult to work from home for those not fortunate to have a high-speed ISP
+
+Your mobile provider cannot prove this method (link:https://github.com/RiFi2k/unlimited-tethering[among some others]) is being used, since it's thorough with getting around their checks + 
+Your mobile provider can speculate based on data usage patterns (especially if no VPN is used), so use lots of data at your own risk
+
 == Requirements
 * Magisk, and by that accord *root*; link:https://github.com/ghost-420/Ez_Magisk[installing Magisk (via recovery)]
 * link:https://github.com/Magisk-Modules-Repo/MagiskHidePropsConf#installation[MagiskHide Props Config] module installed
@@ -27,7 +33,7 @@ endif::[]
 *** kdrag0n's link:https://forum.xda-developers.com/t/kernel-pixel-5-proton-kernel.4194683/[ProtonKernel] for Pixel 4a 5G/Pixel 5
 *** kristofpetho's link:https://forum.xda-developers.com/t/kernel-oos-omega-kernel-oos11-august-7-2021.4271027/[Omega Kernel] for OnePlus 9 Pro
 
-TIP: Search terms to use on XDA Forums to find other kernels with "xt_HL.ko" support: +
+NOTE: Search terms to use on link:https://forum.xda-developers.com/search/[XDA Forums] to find other kernels with "xt_HL.ko" support: +
 TTL spoofing +
 TTL target +
 IPtables TTL +
@@ -37,9 +43,9 @@ TTL module +
 NOTE: Testing "xt_HL.ko" support: +
 1. Launch Termux +
 2. ``su`` +
-3. ``iptables -t mangle -A POSTROUTING -o wlan+ -j TTL --ttl-set 64;ip6tables -t mangle -A POSTROUTING -o wlan+ -j HL --hl-set 64``
+3. ``iptables -t mangle -A POSTROUTING -o wlan+ -j TTL --ttl-set 64;ip6tables -t mangle -A POSTROUTING -o wlan+ -j HL --hl-set 64`` +
 
-TIP: -> If your custom kernel does not support `--ttl-set` and `--hl-set`, inform them of this repository publicly (to increase exposure of these instructions) +
+TIP: If your preferred custom kernel does not support `--ttl-set` and `--hl-set`, inform them of this repository +
  For kernel tweakers: link:https://web.archive.org/web/20210423030541/https://forum.xda-developers.com/t/magisk-stock-bypass-tether-restrictions.4262265/[an aid with enabling "xt_HL.ko" support through Magisk]
 
 == 1. Configure props
@@ -73,8 +79,8 @@ NOTE: ↵ is the kbd:[Enter / Return] key
 
 NOTE: TTL changes reset on reboot/shut down/boot with this method
 
-___
 ====
+___
 
 . Open AFWall+ -> 3 vertical dots (hamburger menu) -> Preferences
 - UI Preferences
@@ -98,7 +104,7 @@ ip6tables -t mangle -A POSTROUTING -o rndis+ -j HL --hl-set 64
 ----
 
 == 3. Test TTL & HL change on the tethered device
-NOTE: kbd:[CTRL C] to stop pinging at any time
+NOTE: kbd:[CTRL + C] to stop pinging at any time
 
 * IPv4/TTL/iptables: `ping -4 gnu.org`
 * IPv6/HL/ip6tables: `ping -6 gnu.org`

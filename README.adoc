@@ -23,8 +23,9 @@ WARNING: VPNs don't grant privacy, Tor and I2P do; these can easily be used alon
 For this guide, VPNs are used for the intention of hiding traffic from your mobile provider, and ensuring web content isn't blocked +
 *`Ultimately, usage of a VPN is optional`*
 
-___
-.Good paid VPN providers do the following:
+.Good paid VPN providers do the following (includes my VPN provider recommendations)
+[%collapsible]
+====
 * Transparent communication, and all software used is open-source
 * Use only dedicated/physical/bare metal servers (faster and more secure than virtual servers, called "VPS" or "VDS")
 * Servers are only located in countries with lots of transit capability (for South America, is only Brazil)
@@ -48,12 +49,12 @@ TIP: Trust-worthy free VPN providers, but have slow network speeds: +
 
 [quote, Cryptostorm blog, https://cryptostorm.is/blog/wireguard-support-added ]
 "Our free WireGuard server works the same as our "Cryptofree" service: bandwidth is throttled to roughly 160kbps down, 130kbps up. Not fast enough to watch any HD videos, but plenty of bandwidth for sending an email, browsing a website, IRC, etc."
+====
 
 == Requirements
 * Magisk, and by that accord *root*; link:https://github.com/ghost-420/Ez_Magisk[installing Magisk (via recovery)]
 * link:https://github.com/Magisk-Modules-Repo/MagiskHidePropsConf#installation[MagiskHide Props Config] module installed
 * The link:https://f-droid.org/en/packages/com.termux/[Termux] terminal emulator (link:https://wiki.termux.com/wiki/Termux_Google_Play[from F-Droid only])
-* link:https://f-droid.org/en/packages/dev.ukanth.ufirewall/[AFWall+ from F-Droid]
 
 * Install Busybox Magisk module
 . Magisk -> Modules (puzzle piece icon)
@@ -66,7 +67,7 @@ TIP: Trust-worthy free VPN providers, but have slow network speeds: +
 * Kernel with the "xt_HL.ko" module (netfilter's TTL packet mangling) enabled
 ** Known kernels with support (and seem high-quality):
 *** Freak07's link:https://forum.xda-developers.com/t/kernel-23-07-2021-android-11-kirisakura-1-1-8-for-asus-zenfone-8-aka-sake.4295287/[Kirisakura] for ASUS ZenFone 8
-*** kdrag0n's link:https://forum.xda-developers.com/t/kernel-pixel-5-proton-kernel.4194683/[ProtonKernel] for Pixel 4a 5G/Pixel 5
+*** kdrag0n's link:https://forum.xda-developers.com/t/kernel-pixel-5-proton-kernel.4194683/[Proton Kernel] for Google Pixel 4a 5G/Pixel 5
 *** kristofpetho's link:https://forum.xda-developers.com/t/kernel-oos-omega-kernel-oos11-august-7-2021.4271027/[Omega Kernel] for OnePlus 9 Pro
 
 NOTE: Search terms to use on link:https://forum.xda-developers.com/search/[XDA Forums] to find other kernels with "xt_HL.ko" support: +
@@ -80,6 +81,7 @@ NOTE: Testing "xt_HL.ko" support: +
 1. Launch Termux +
 2. ``su`` +
 3. ``iptables -t mangle -A POSTROUTING -o wlan+ -j TTL --ttl-set 64;ip6tables -t mangle -A POSTROUTING -o wlan+ -j HL --hl-set 64`` +
+If there's no output, the commands succeeded (kernel has "xt_HL.ko" support)
 
 TIP: If your preferred custom kernel does not support `--ttl-set` and `--hl-set`, inform them of this repository +
  For kernel tweakers: link:https://web.archive.org/web/20210423030541/https://forum.xda-developers.com/t/magisk-stock-bypass-tether-restrictions.4262265/[an aid with enabling "xt_HL.ko" support through Magisk]
@@ -104,19 +106,30 @@ NOTE: ↵ is the kbd:[Enter / Return] key
 
 == 2. Adjust TTL & HL
 
-.Alternative method for kernels with no "xt_HL.ko" support
+.Termux:Boot method
 [%collapsible]
 ====
+* link:https://f-droid.org/en/packages/com.termux.boot/[Install Termux:Boot]
+* Disable "battery optimizations" for Termux and Termux:Boot in your phone's Settings
 
-. Install link:https://play.google.com/store/apps/details?id=org.segin.ttleditor[TTL Editor]
-. Open TTL Editor
-. Check "Apply to all network interfaces using /proc"
-. Press OK to the side of "Set new TTL" to apply a chosen TTL, likely 64
+$ `mkdir -p ~/.termux/boot` +
+$ `cd ~/.termux/boot` +
+$ `nano set-tether-ttl.sh`
+[source, shell]
+----
+#!/data/data/com.termux/files/usr/bin/sh
+su -c "iptables -t mangle -A POSTROUTING -o +rmnet+ -j TTL --ttl-set 64;iptables -t mangle -A POSTROUTING -o rndis+ -j TTL --ttl-set 64;ip6tables -t mangle -A POSTROUTING -o +rmnet+ -j HL --hl-set 64;ip6tables -t mangle -A POSTROUTING -o rndis+ -j HL --hl-set 64"
+----
+Test if the script works: +
+$ `chmod +x set-tether-ttl.sh; sh set-tether-ttl.sh`
 
-NOTE: TTL changes reset on reboot/shut down/boot with this method
-
+NOTE: If there's no output, the commands succeeded (script works correctly)
 ====
-___
+
+.AFWall+ method (will not work on ROMs with their own Firewall app, such as CalyxOS)
+[%collapsible]
+====
+* link:https://f-droid.org/en/packages/dev.ukanth.ufirewall/[Install AFWall+]
 
 . Open AFWall+ -> 3 vertical dots (hamburger menu) -> Preferences
 - UI Preferences
@@ -138,9 +151,24 @@ iptables -t mangle -A POSTROUTING -o rndis+ -j TTL --ttl-set 64
 ip6tables -t mangle -A POSTROUTING -o +rmnet+ -j HL --hl-set 64
 ip6tables -t mangle -A POSTROUTING -o rndis+ -j HL --hl-set 64
 ----
+====
+
+.Not recommended; method for kernels with no "xt_HL.ko" support
+[%collapsible]
+====
+
+. Install link:https://play.google.com/store/apps/details?id=org.segin.ttleditor[TTL Editor]
+. Open TTL Editor
+. Check "Apply to all network interfaces using /proc"
+. Press OK to the side of "Set new TTL" to apply a chosen TTL, likely 64
+
+NOTE: TTL changes reset on reboot/shut down/boot with this method
+
+====
 
 == 3. Test TTL & HL change on the tethered device
-NOTE: kbd:[CTRL + C] to stop pinging at any time
+NOTE: Tethered device = Windows or Linux or macOS machine (not Android) +
+kbd:[CTRL + C] to stop pinging at any time (on Windows)
 
 * IPv4/TTL/iptables: `ping -4 gnu.org`
 * IPv6/HL/ip6tables: `ping -6 gnu.org`

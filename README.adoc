@@ -8,62 +8,26 @@ ifdef::env-github[]
 :warning-caption: :warning:
 endif::[]
 
-== About
-Artifical restrictions placed on tethering make it difficult to work from home for those not fortunate to have a high-speed ISP
-
-* Your mobile provider cannot:
-** Entirely prove this method (link:https://github.com/RiFi2k/unlimited-tethering[among some others]) is being used
-* Your mobile provider can (if no VPN, or Tor, or I2P, or proxy is used):
-** Check for specific domains being connected to that only a Windows PC would connect to, but not an Android phone, to assume the current month is all tethered traffic
-** Using link:https://en.wikipedia.org/wiki/Deep_packet_inspection[DPI software], traffic can be shaped/tampered/manipulated/throttled based on certain criteria(s), such as Video Streaming (making YouTube videos or Netflix buffer more, some like T-Mobile force lower video quality)
-
-A paid VPN is recommended since it's easy to route all traffic through it, and shouldn't reduce speeds (if the VPN connection is on a device with link:https://en.wikipedia.org/wiki/AES_instruction_set#x86_architecture_processors[AES-NI support])
-
-WARNING: VPNs don't grant privacy, Tor and I2P do; these can easily be used alongside a VPN if desired +
-For this guide, VPNs are used for the intention of hiding traffic from your mobile provider, and ensuring web content isn't blocked +
-*`Ultimately, usage of a VPN is optional`*
-
-.Good paid VPN providers do the following (includes my VPN provider recommendations)
-[%collapsible]
-====
-* Transparent communication, and all software used is open-source
-* Use only dedicated/physical/bare metal servers (faster and more secure than virtual servers, called "VPS" or "VDS")
-* Servers are only located in countries with lots of transit capability (for South America, is only Brazil)
-* No fake server locations (unless for streaming purposes on specific domains/websites, and is stated as such)
-* All server locations allow all forms of traffic except outbound port 25 (to prevent email spam abuse) 
-* Word of mouth advertising; not shoved in your face by sponsored YouTube videos and Google Ads
-* VPN's company is not based in a tax haven country; tax haven = profitability is heavily considered, meaning they'd likely sell your data to earn more profit
-* Ability to link:https://airvpn.org/faq/port_forwarding/[select ports to forward] (not just a randomized port on connection, as is the case with PIA/Private Internet Access)
-
-For your own research, avoid all websites recommending VPNs under the parent company "Kape Technologies": https://restoreprivacy.com/private-internet-access-kape-crossrider/
-
-* Recommendations:
-. link:https://airvpn.org[AirVPN] | link:https://airvpn.dev[AirVPN #2] | link:http://airvpn3epnw2fnsbx5x2ppzjs6vxtdarldas7wjyqvhscj7x43fxylqd.onion[AirVPN via Tor]
-. link:https://mullvad.net[Mullvad] | link:http://o54hon2e2vj6c7m3aqqu6uyece65by3vgoxxhlqlsvkmacw6a7m7kiad.onion[Mullvad via Tor]
-. Cryptostorm (best at bypassing VPN blocking due to competitors not having the "port striping" feature, which is link:https://archive.is/6LyZf[documented] on how it's done)
-. link:https://www.ovpn.com[OVPN]
-
-TIP: Trust-worthy free VPN providers, but have slow network speeds: +
-1. link:https://riseup.net/en/vpn[Riseup] | link:http://vww6ybal4bd7szmgncyruucpgfkqahzddi37ktceo3ah7ngmcopnpyyd.onion/en/vpn[Riseup via Tor] +
-2. link:https://cryptostorm.is/wireguard[Cryptostorm] | link:http://kzaeunogz6s75ptgy6ifjzwwy75xdfenenswvrczd7mewxgrad5a.b32.i2p/[Cryptostorm via I2P] (I2P > Tor when available) | link:http://stormwayszuh4juycoy4kwoww5gvcu2c4tdtpkup667pdwe4qenzwayd.onion/wireguard[Cryptostorm via Tor]
-
-[quote, Cryptostorm blog, https://cryptostorm.is/blog/wireguard-support-added ]
-"Our free WireGuard server works the same as our "Cryptofree" service: bandwidth is throttled to roughly 160kbps down, 130kbps up. Not fast enough to watch any HD videos, but plenty of bandwidth for sending an email, browsing a website, IRC, etc."
-====
+WARNING: **Rooting is a very bad idea, as it will entirely break the security model of Android.** +
+If you're considering using an unused phone to tether from (which is rooted, and contents were already wiped), check the bands it supports on link:https://www.kimovil.com/[Kimovil].
 
 == Requirements
-* Magisk, and by that accord *root*; link:https://github.com/ghost-420/Ez_Magisk[installing Magisk (via recovery)]
+* Magisk, and by that accord *root*; link:https://github.com/Iazos/Ez_Magisk[installing Magisk (via recovery)]
+
 * link:https://github.com/Magisk-Modules-Repo/MagiskHidePropsConf#installation[MagiskHide Props Config] module installed
 * The link:https://f-droid.org/en/packages/com.termux/[Termux] terminal emulator (link:https://wiki.termux.com/wiki/Termux_Google_Play[from F-Droid only])
 
-* Install Busybox Magisk module
+* Installing Busybox Magisk module
 . Magisk -> Modules (puzzle piece icon)
 . Search for 'busybox' to find "Busybox for Android NDK", then install it
 
-== Recommended/optional
-* Access to a VPN provider that respects its users (no traffic shaping)
+.**Recommended (for root)**
+[%collapsible]
+====
+
 * Google Play Store, alternatively through link:https://gitlab.com/AuroraOSS/AuroraStore/-/releases[Aurora Store]
-* link:https://play.google.com/store/apps/details?id=com.draco.ktweak[KTweak for higher network speeds], using its 'throughput' profile
+** link:https://play.google.com/store/apps/details?id=com.draco.ktweak[KTweak for higher network speeds], using its 'throughput' profile
+
 * Kernel with the "xt_HL.ko" module (netfilter's TTL packet mangling) enabled
 ** Known kernels with support (and seem high-quality):
 *** Freak07's link:https://forum.xda-developers.com/t/kernel-23-07-2021-android-11-kirisakura-1-1-8-for-asus-zenfone-8-aka-sake.4295287/[Kirisakura] for ASUS ZenFone 8
@@ -79,20 +43,78 @@ TTL module +
 
 NOTE: Testing "xt_HL.ko" support: +
 1. Launch Termux +
-2. ``su`` +
-3. ``iptables -t mangle -A POSTROUTING -o wlan+ -j TTL --ttl-set 64;ip6tables -t mangle -A POSTROUTING -o wlan+ -j HL --hl-set 64`` +
+2. `$ su` +
+4. `# iptables -t mangle -A POSTROUTING -o wlan+ -j TTL --ttl-set 64` +
+5. `# ip6tables -t mangle -A POSTROUTING -o wlan+ -j HL --hl-set 64` +
 If there's no output, the commands succeeded (kernel has "xt_HL.ko" support)
 
 TIP: If your preferred custom kernel does not support `--ttl-set` and `--hl-set`, inform them of this repository +
  For kernel tweakers: link:https://web.archive.org/web/20210423030541/https://forum.xda-developers.com/t/magisk-stock-bypass-tether-restrictions.4262265/[an aid with enabling "xt_HL.ko" support through Magisk]
 
-== 1. Configure props
-NOTE: ↵ is the kbd:[Enter / Return] key
+====
 
+=== Don't meet the root requirement?
+
+* This is the preferred way, if...
+** The ROM used explicitly stops Android from snitching:
+*** https://github.com/GrapheneOS/platform_frameworks_base/commit/d4e03e77dd590e3ed89af8b72d5c09f875fc46b0
+*** https://github.com/GrapheneOS/platform_build/commit/b22db418509758b781699898dc43c1c1d3a94999
+
+* With this or despite this...
+** Always set TTL to 65 on the devices being tethered to
+*** Adjusting TTL alone could work on a few telecoms, but it's meant as a supplemental step for telecoms with smarter detections
+
+NOTE: Some router firmware (Asuswrt-Merlin, DD-WRT, Tomato, OpenWrt) can set TTL for all devices connected to it.
+
+TIP: Skip straight to the "About" section, then "3. Test TTL & HL change on the tethered device"; these are the only root-less sections
+
+== About
+* Your telecom cannot:
+** Directly prove this method (link:https://github.com/RiFi2k/unlimited-tethering[among some others]) is being used
+*** Telecoms do know about this, but the offensive (this guide) is much stronger than the defensive, their defense being: DPI software, and the OS (Android and iOS) telling the telecom that it's tethered +
+This guide can solve the OS problem unless it's iOS (buy the latest Google Pixel next time, it has proper firmware & hardware & software security as iPhones do)
+
+* Your telecom can (if no traffic encryptor such as Tor or a VPN is used):
+** Check for specific domains being connected to that only a Windows PC or Mac would connect to, but not an Android phone.
+** Use link:https://en.wikipedia.org/wiki/Deep_packet_inspection[DPI software] to  shape traffic based on certain criteria(s), such as Video Streaming (throttling YouTube videos and/or Netflix, and/or forcing lower video quality)
+
+* A paid VPN is recommended since it's easy to route all traffic through it, and shouldn't reduce speeds, given the following criteria:
+** Protocol used is WireGuard (fastest, expect on unreliable links), IKEv2 (best on unreliable links), or SoftEther (reasonably fast and best at bypassing DPI). +
+** If the speeds are lower than expected on all protocols, connect to the VPN on a different device, specifically one with link:https://en.wikipedia.org/wiki/AES_instruction_set#x86_architecture_processors[AES-NI supported]
+
+WARNING: VPNs don't grant privacy, Tor and I2P do; these can easily be used alongside a VPN if desired +
+For this guide, VPNs are used for the intention of hiding traffic from your telecom, and ensuring web content isn't blocked +
+*`Ultimately, usage of a VPN is optional`*
+
+.Good paid VPN providers do the following (and VPN recommendations)
+[%collapsible]
+====
+
+* Transparent communication
+* Use only dedicated/physical/bare metal servers
+** Dedis are faster and more secure than virtual servers ("VPS" / "VDS")
+** No hard drives installed in the servers is a good bonus
+* No fake (geo-located) server locations
+** Unless they are stated as such
+* All server locations allow all traffic except outbound port 25 (to prevent email spam abuse) 
+* Ability to link:https://airvpn.org/faq/port_forwarding/[select ports to forward].
+** AirVPN, hide.me, and TorGuard have the best implementations of port forwarding
+*** link:https://teddit.net/r/VPNTorrents/comments/oqnnrq/list_of_vpns_that_allow_portforwarding_2021/[List of VPNs that allow P2P and Port Forwarding]
+
+* Recommendations based on the above criteria and personal experiences:
+. link:https://airvpn.org[AirVPN]
+** Mirrors: link:https://airvpn.dev[AirVPN #2] | link:http://airvpn3epnw2fnsbx5x2ppzjs6vxtdarldas7wjyqvhscj7x43fxylqd.onion[AirVPN via Tor]
+. link:https://mullvad.net[Mullvad]
+** Mirror: link:http://o54hon2e2vj6c7m3aqqu6uyece65by3vgoxxhlqlsvkmacw6a7m7kiad.onion[Mullvad via Tor]
+. link:https://hide.me[hide.me] (supports IKEv2 and SoftEther; the other recommendations don't)
+
+====
+
+== 1. Configure props
 . Launch Termux
-. ``su``
-. ``settings delete system tether_entitlement_check_state;settings delete global tether_dun_required``
-. ``props``
+. `$ su`
+. `# settings delete system tether_entitlement_check_state; settings delete global tether_dun_required`
+. `# props`
 ** "Select an option below." -> "Add/edit custom props" kbd:[4 ↵]
 ** Select "New custom prop" with kbd:[n ↵]
 *** `net.tethering.noprovisioning` kbd:[↵] -> kbd:[true ↵] -> kbd:[y ↵]
@@ -106,30 +128,39 @@ NOTE: ↵ is the kbd:[Enter / Return] key
 
 == 2. Adjust TTL & HL
 
-.Termux:Boot method
+* Getting the correct network interface(s); look for 'rmnet' and/or 'rndis' (example: "v4-rmnet_data2")
+** `$ netstat -i`
+
+.Termux:Boot
 [%collapsible]
 ====
-* link:https://f-droid.org/en/packages/com.termux.boot/[Install Termux:Boot]
-* Disable "battery optimizations" for Termux and Termux:Boot in your phone's Settings
+* link:https://f-droid.org/en/packages/com.termux.boot/[Install Termux:Boot] and disable "battery optimizations" for Termux and Termux:Boot in your phone's settings
 
-$ `mkdir -p ~/.termux/boot` +
-$ `cd ~/.termux/boot` +
-$ `nano set-tether-ttl.sh`
+* Make the script:
+. `$ mkdir -p ~/.termux/boot` +
+. `$ cd ~/.termux/boot` +
+. `$ nano set-tether-ttl.sh`
+
+NOTE: Replace "v4-rmnet_data2" with your network interface if it's different
+
 [source, shell]
 ----
 #!/data/data/com.termux/files/usr/bin/sh
-su -c "iptables -t mangle -A POSTROUTING -o +rmnet+ -j TTL --ttl-set 64;iptables -t mangle -A POSTROUTING -o rndis+ -j TTL --ttl-set 64;ip6tables -t mangle -A POSTROUTING -o +rmnet+ -j HL --hl-set 64;ip6tables -t mangle -A POSTROUTING -o rndis+ -j HL --hl-set 64"
+su -c "iptables -t mangle -A POSTROUTING -o v4-rmnet_data2 -j TTL --ttl-set 64 && \ 
+ip6tables -t mangle -A POSTROUTING -o v4-rmnet_data2 -j HL --hl-set 64"
 ----
-Test if the script works: +
-$ `chmod +x set-tether-ttl.sh; sh set-tether-ttl.sh`
 
-NOTE: If there's no output, the commands succeeded (script works correctly)
+* Launch the script:
+** `$ chmod +x set-tether-ttl.sh && sh set-tether-ttl.sh`
+
+Termux:Boot will automatically run set-tether-ttl.sh after startup/boot, though it will break if the interface name changes, which I cannot test nor know if this happens on Android, and if it does it may be specific to a ROM
+
 ====
 
-.AFWall+ method (will not work on ROMs with their own Firewall app, such as CalyxOS)
+.AFWall+ (will not work on ROMs with their own Firewall app, such as CalyxOS)
 [%collapsible]
 ====
-* link:https://f-droid.org/en/packages/dev.ukanth.ufirewall/[Install AFWall+]
+* link:https://github.com/ukanth/afwall#availability[Install AFWall+]
 
 . Open AFWall+ -> 3 vertical dots (hamburger menu) -> Preferences
 - UI Preferences
@@ -140,41 +171,39 @@ NOTE: If there's no output, the commands succeeded (script works correctly)
 . Open AFWall+ -> 3 vertical dots (hamburger menu) -> Set custom script
 . Put in "Enter custom script below"
 
-////
-Blanket setting \*rmnet* might be a bad idea? +
-rndis* is specific to USB tethering; \*rmnet* still has business with USB tethering, along with all other tether types
-////
+NOTE: Replace "v4-rmnet_data2" with your network interface if it's different
+
 [source]
 ----
-iptables -t mangle -A POSTROUTING -o +rmnet+ -j TTL --ttl-set 64
-iptables -t mangle -A POSTROUTING -o rndis+ -j TTL --ttl-set 64
-ip6tables -t mangle -A POSTROUTING -o +rmnet+ -j HL --hl-set 64
-ip6tables -t mangle -A POSTROUTING -o rndis+ -j HL --hl-set 64
+iptables -t mangle -A POSTROUTING -o v4-rmnet_data2 -j TTL --ttl-set 64
+ip6tables -t mangle -A POSTROUTING -o v4-rmnet_data2 -j HL --hl-set 64
 ----
 ====
 
-.Not recommended; method for kernels with no "xt_HL.ko" support
+.For kernels with no "xt_HL.ko" support; not recommended
 [%collapsible]
 ====
 
 . Install link:https://play.google.com/store/apps/details?id=org.segin.ttleditor[TTL Editor]
 . Open TTL Editor
 . Check "Apply to all network interfaces using /proc"
+** Or specify a specific interface, "v4-rmnet_data2" being an example
 . Press OK to the side of "Set new TTL" to apply a chosen TTL, likely 64
 
-NOTE: TTL changes reset on reboot/shut down/boot with this method
+NOTE: TTL changes aren't persistent with this method, rebooting/shutdown will lose these changes until you apply them manually again
 
 ====
 
 == 3. Test TTL & HL change on the tethered device
-NOTE: Tethered device = Windows or Linux or macOS machine (not Android) +
-kbd:[CTRL + C] to stop pinging at any time (on Windows)
 
-* IPv4/TTL/iptables: `ping -4 gnu.org`
-* IPv6/HL/ip6tables: `ping -6 gnu.org`
+TIP: kbd:[Ctrl + C] to stop pinging at any time 
+
+* IPv4 (test TTL): `$ ping -4 gnu.org`
+* IPv6 (test HL): `$ ping -6 gnu.org`
 
 If the TTL & HL is 64, you've successfully completed this guide
 
-TIP: If this works, then Star this repository!
+TIP: If this works, then Star this repository! +
+Purpose being to make this repository more discoverable, so more can easily bypass these restrictions set in place by telecom providers.
 
 NOTE: If this didn't work, try link:https://github.com/RiFi2k/unlimited-tethering[RiFi2k's method]

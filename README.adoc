@@ -116,12 +116,79 @@ NOTE: Search terms to use on link:https://forum.xda-developers.com/search/[XDA F
 
 == 2. Spoof TTL & HL
 
+NOTE: For dual (or more) router setups, each router has to apply TTL/HL spoofing of their own.
+
 === Router methods
-.Asuswrt-Merlin >unfinished, TODO<
+.Asuswrt-Merlin
 [%collapsible]
 ====
-. `WAN` -> disable `Extend the TTL value` and `Spoof LAN TTL value`.
+. `Advanced Settings - WAN` -> disable `Extend the TTL value` and `Spoof LAN TTL value`.
+. `Advanced Settings - Administration`
+** `Enable JFFS custom scripts and configs` -> "Yes"
+** `Enable SSH` -> "LAN only"
+. Replace the LAN IP and login name if needed: `$ ssh 192.168.50.1 -l asus`
+** Use other SSH clients if preferred, such as MobaXterm or Termius.
+. `# nano /jffs/scripts/wan-event`
 
+[source, shell]
+----
+#!/bin/sh
+# wan-event
+# Martineau wrote this script
+# See https://www.snbforums.com/threads/wan-start-script-also-run-on-wan-stop.61295/#post-542636
+#
+#   v384.15 Introduced wan-event script, (wan-start will be deprecated in a future release.)
+#
+#          wan-event      {0 | 1} {stopping | stopped | disconnected | init | connecting | connected}
+#
+# shellcheck disable=SC2068
+Say() {
+  printf '%s%s' "$$" "$@" | logger -st "($(basename "$0"))"
+}
+#========================================================================================================================================
+WAN_IF=$1
+WAN_STATE=$2
+
+# Call appropriate script based on script_type
+SERVICE_SCRIPT_NAME="wan${WAN_IF}-${WAN_STATE}"
+SERVICE_SCRIPT_LOG="/tmp/WAN${WAN_IF}_state"
+
+# Execute and log script state
+if [ -f "/jffs/scripts/${SERVICE_SCRIPT_NAME}" ]; then
+  Say "     Script executing.. for wan-event: $SERVICE_SCRIPT_NAME"
+  echo "$SERVICE_SCRIPT_NAME" >"$SERVICE_SCRIPT_LOG"
+  sh /jffs/scripts/"${SERVICE_SCRIPT_NAME}" "$@"
+else
+  Say "     Script not defined for wan-event: $SERVICE_SCRIPT_NAME"
+fi
+
+##@Insert##
+----
+
+`# nano /jffs/scripts/wan0-connected`
+[source, shell]
+----
+#!/bin/sh
+
+if [ ! -e "/tmp/_connected-once" ]; then
+    # HACK: Not sure what to check for exactly; do it too early and the TTL & HL don't get set.
+    sleep 5s
+
+    modprobe xt_HL; wait
+
+    iptables -t mangle -I PREROUTING -i usb+ -j TTL --ttl-inc 2
+    iptables -t mangle -I POSTROUTING -o usb+ -j TTL --ttl-inc 2
+    ip6tables -t mangle -I PREROUTING ! -p icmpv6 -i usb+ -j HL --hl-inc 2
+    ip6tables -t mangle -I POSTROUTING ! -p icmpv6 -o usb+ -j HL --hl-inc 2
+
+    touch /tmp/_connected-once
+fi
+----
+Have to set permissions correctly to avoid this: `custom_script: Found wan-event, but script is not set executable!` +
+`# chmod a+rx /jffs/scripts/*` +
+`# reboot`
+
+___
 ====
 
 .GoldenOrb & OpenWrt via LuCI
@@ -130,18 +197,21 @@ NOTE: Search terms to use on link:https://forum.xda-developers.com/search/[XDA F
 . GoldenOrb specific: `Network` -> `Firewall` -> `Custom TTL Settings`
 ** Ensure its option is disabled.
 . `Network` -> `Firewall` -> `Custom Rules`
-```
-iptables -t mangle -I PREROUTING -i usb+ -j TTL --ttl-inc 1
-iptables -t mangle -I POSTROUTING -o usb+ -j TTL --ttl-inc 1
-ip6tables -t mangle -I PREROUTING ! -p icmpv6 -i usb+ -j HL --hl-inc 1
-ip6tables -t mangle -I POSTROUTING ! -p icmpv6 -o usb+ -j HL --hl-inc 1
-```
-* Compare the TTL and HL of the tethering (Android) device and the router (or any device connected to that router), they should both be the same TTL and HL. If not, change the increment (ttl-inc, hl-inc).
+[source, shell]
+----
+iptables -t mangle -I PREROUTING -i usb+ -j TTL --ttl-inc 2
+iptables -t mangle -I POSTROUTING -o usb+ -j TTL --ttl-inc 2
+ip6tables -t mangle -I PREROUTING ! -p icmpv6 -i usb+ -j HL --hl-inc 2
+ip6tables -t mangle -I POSTROUTING ! -p icmpv6 -o usb+ -j HL --hl-inc 2
+----
+
+* Compare the TTL and HL of the tethering (Android) device and any device connected to that router, they should both be the same TTL and HL. If not, change the increment (ttl-inc, hl-inc).
 ** IPv4/TTL: `$ ping -4 bing.com`
 *** For Android & macOS: `$ ping bing.com` 
 ** IPv6/HL: `$ ping -6 bing.com`
 *** For Android & macOS: `$ ping6 bing.com`
 
+___
 ====
 
 NOTE: For unlisted firmwares, if you get TTL & HL spoofing functional, please edit README.adoc to include instructions for that firmware, then make a Pull Request once you're done. +

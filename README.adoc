@@ -10,198 +10,184 @@ endif::[]
 
 == Introduction
 
-This guide showcases the fastest and most reliable way of tethering on Android (both non-root and root), but is incompatible with many ROMs and kernels. +
-There are sections made within reason to make this guide compatible with more devices, with those being clearly defined as worse choices.
+.This guide for Android bypasses Deep Packet Inspection (DPI) and tethering/hotspot detections, with two other main goals:
+* No large speed reduction, as is the case with the SSH or SSL tunneling methods.
+* Making it difficult for telecoms to prove intentional bypassing of their DPI firewall and tethering detections.
+** "Anti-DPI" software which are not VPNs, make it very obvious to a telecom that you intentionally bypassed their restrictions and/or throttling.
 
-WARNING: A rooted tethering device (Android phone likely) is faster and far more reliable than non-rooted devices with mobile data after finishing this guide. +
-Just ensure the rooted tethering device has no sensitive information, as root entirely breaks Android's security measures.
+.Before proceeding, check the bands the phone or tablet (tethering device) supports at link:https://cacombos.com[Bands & Combos].
+* If its LTE category is 6 or lower, don't expect good network speeds from that device for any guide.
 
-. Check the bands the phone or tablet supports before proceeding, at: link:https://www.kimovil.com/[Kimovil] +
-If it doesn't support all of your telecom's bands, don't expect good results (for any guide).
-. Enabling "Data Saver" while tethering is recommended. Which should restrict data usage to tethering, and what app is at the forefront only. +
-** Don't use Google Play Services or microG if possible, as they may ignore "Data Saver" completely.
-*** Those two apps can also slow the device down while also draining the device's battery heavily; this is more severe on older Android versions, and some ROMs deviating heavily from Google's AOSP.
+Enabling "Data Saver" while USB tethering is recommended, as it should restrict data usage to USB tethering, and what app is at the forefront only. +
+Regardless, WiFi "hotspot" tethering will block "Data Saver". 
 
+=== A VPN is required
 
-== Rooted requirements
-*1: link:https://topjohnwu.github.io/Magisk/[Install Magisk], then...*
-
-** The link:https://github.com/Magisk-Modules-Repo/MagiskHidePropsConf#installation[MagiskHide Props Config] module.
-
-** The link:https://f-droid.org/en/packages/com.termux/[Termux] terminal emulator (link:https://wiki.termux.com/wiki/Termux_Google_Play[from F-Droid only]).
-*** If you are using an F-Droid app to download and install Termux, don't use the official F-Droid app,  use link:https://github.com/Iamlooker/Droid-ify/releases[Droid-ify] instead.
-
-** The Busybox Magisk module:
-. Magisk -> `Modules` (puzzle piece icon)
-. Search for 'busybox' to find "Busybox for Android NDK", then install it.
-
-
-*2: Install the following apps; if needed, use the link:https://gitlab.com/AuroraOSS/AuroraStore/-/releases[Aurora Store] app for installing apps on the Google Play Store.*
-
-* link:https://play.google.com/store/apps/details?id=com.draco.ktweak[KTweak for higher network speeds], using its "throughput" profile.
-
-* link:https://adaway.org/[AdAway to block Network Signal Guru's ads]. +
-Magisk's "Systemless Hosts" feature has to be enabled for AdAway to work.
-
-** link:https://play.google.com/store/apps/details?id=com.qtrun.QuickTest[Network Signal Guru for band locking], which is required to maintain reliable speeds.
-
-
-*3: The kernel in use has the "xt_HL.ko" module built-in (netfilter's TTL packet mangling).*
-
-* High-quality kernels with "xt_HL.ko" support, that also use the BBR TCP congestion control algorithm (which link:https://docs.google.com/spreadsheets/d/1I1NcVVbuC7aq4nGalYxMNz9pgS9OLKcFHssIBlj9xXI/edit#gid=1926845420[greatly increases reliability]):
-** kdrag0n's link:https://forum.xda-developers.com/search/member?user_id=7291478&content=thread[Proton Kernel].
-** Freak07's link:https://forum.xda-developers.com/search/member?user_id=3428502&content=thread[Kirisakura] kernel.
-
-NOTE: Search terms to use on link:https://forum.xda-developers.com/search/[XDA Forums] to find other kernels with "xt_HL.ko" support: +
-`TTL spoofing`, `TTL target`, `IPtables TTL`, `TTL/HL target`, `TTL module`.
-
-* Testing "xt_HL.ko" support: +
-. Launch Termux. +
-. `$ su` +
-. `# iptables -t mangle -A POSTROUTING -o wlan+ -j TTL --ttl-set 64` +
-. `# ip6tables -t mangle -A POSTROUTING -o wlan+ -j HL --hl-set 64` +
-** If there's no output, the commands succeeded (kernel has "xt_HL.ko" support).
-
-TIP: If your preferred custom kernel does not support `--ttl-set` and `--hl-set`, inform them of this repository. +
- For kernel tweakers: link:https://web.archive.org/web/20210423030541/https://forum.xda-developers.com/t/magisk-stock-bypass-tether-restrictions.4262265/[an example of enabling "xt_HL.ko" support through Magisk].
-
-== For non-rooted
-
-* *Using a ROM that explicitly stops Android from snitching is required:*
-*** https://github.com/GrapheneOS/platform_frameworks_base/commit/d4e03e77dd590e3ed89af8b72d5c09f875fc46b0
-*** https://github.com/GrapheneOS/platform_build/commit/b22db418509758b781699898dc43c1c1d3a94999
-
-* Caveats:
-** Cell band locking is likely not possible; don't expect reliable stationary speeds.
-** TTL detections have to be bypassed per device, or a router has to do it with one of the following firmwares:
-*** Asuswrt-Merlin: `WAN` -> enable `Extend the TTL value` and `Spoof LAN TTL value`.
-*** DD-WRT, Tomato, OpenWrt, or GoldenOrb (the best option for anything telecom related).
-
-
-== About telecoms (mobile providers/carriers)
-* Telecoms do know about these tricks, but the offensive (this guide) is much stronger than the defensive.
-** Telecoms' defenses being:
-*** Using link:https://en.wikipedia.org/wiki/Deep_packet_inspection[DPI software] to detect and/or shape traffic based on certain criteria, such as Video Streaming (throttling YouTube and/or Netflix to force low video quality), which VPNs directly counter.
-**** If VPNs are pwned (blocked and/or throttled), try these protocols: IKEv2, SoftEther, then OpenVPN with tls-crypt (use TCP if UDP is pwned).
-*** Android and iOS telling the telecom that it's tethered/hotspot data.
-*** Checking the IMEI of the device to see if it's a phone/tablet or not.
-**** Sometimes blocking IMEIs (usually non-Sierra LTE modems like Quectel, but can be easily spoofed into an allowed IMEI anyway...)
-
-=== VPNs
-
-A paid VPN is recommended as it's easy to route all traffic through it, and shouldn't reduce speeds if:
+A paid VPN is recommended as they provide protocols which bypass DPI blocking, and shouldn't reduce speeds if:
 
 * The protocol used is IKEv2 (fastest on unreliable links), or SoftEther (the best at bypassing DPI software, with good speeds). +
-** WireGuard is fastest on not unreliable links, but is easily detected by DPI software.
+** NOTE: WireGuard is fastest on *not* unreliable links, but is easily detected by DPI software.
 ** If the speeds are lower than expected on all protocols, connect to the VPN on a different device, specifically one with link:https://en.wikipedia.org/wiki/AES_instruction_set#x86_architecture_processors[AES-NI supported].
 
 .Good paid VPN providers do the following
 [%collapsible]
 ====
 
-. Transparent communication, and easily accessible forums or a Discord "guild".
+. Transparent communication and easily accessible forums, or a Discord "guild".
 . Only bare-metal (dedicated) servers used, with no hard drives (RAM only).
 ** Bare-metal is faster and more secure than virtual servers ("VPS" / "VDS").
-. State their geolocated (fake) server locations, or have none.
+. State all their geolocated (fake) server locations, or have none.
 . All server locations allow all traffic except outbound port 25.
 ** P2P should never be blocked, despite also being abuse-prone.
 . Ability to link:https://airvpn.org/faq/port_forwarding/[select ports to forward]; this heavily gauges if a VPN provider is worth your time, even if you never need port forwarding.
 ** AirVPN, hide.me, Mullvad, and TorGuard have the best implementations of port forwarding as of 31 December 2021.
 *** link:https://teddit.net/r/VPNTorrents/comments/oqnnrq/list_of_vpns_that_allow_portforwarding_2021/[List of VPNs that allow Port Forwarding].
+. Provide SoftEther and IKEv2 protocols.
 
 ====
 
-== 1. Start of the root-only guide: Configure props
+== Non-rooted requirements
 
-NOTE: For non-root, skip to *3.*
+* The ROM must explicitly stop Android from snitching:
+*** https://github.com/GrapheneOS/platform_frameworks_base/commit/d4e03e77dd590e3ed89af8b72d5c09f875fc46b0
+*** https://github.com/GrapheneOS/platform_build/commit/b22db418509758b781699898dc43c1c1d3a94999
+
+For rooted devices, you force the ROM to stop snitching instead.
+
+== Rooted requirements
+
+WARNING: This guide can work regardless of root, but a rooted tethering device is recommended for additional control that is useful for increasing and/or maintaining speeds. +
+Just ensure the rooted tethering device has no sensitive information, as root entirely breaks Android's security measures.
+
+*1: link:https://topjohnwu.github.io/Magisk/[Install Magisk], then the link:https://github.com/Magisk-Modules-Repo/MagiskHidePropsConf#installation[MagiskHide Props Config] module.*
+
+*2: Install the following apps; if needed, use the link:https://gitlab.com/AuroraOSS/AuroraStore/-/releases[Aurora Store] app for installing apps on the Google Play Store.*
+
+* The link:https://f-droid.org/en/packages/com.termux/[Termux] terminal emulator (link:https://wiki.termux.com/wiki/Termux_Google_Play[from F-Droid only]).
+** If you are using the official F-Droid app to download and install Termux, try using link:https://github.com/Iamlooker/Droid-ify/releases[Droid-ify] instead as the official app is unreliable.
+
+* link:https://play.google.com/store/apps/details?id=com.draco.ktweak[KTweak for higher network speeds], using its "throughput" profile.
+
+* link:https://adguard-dns.com/en/public-dns.html[Configure AdGuard DNS manually] before using Network Signal Guru.
+** link:https://github.com/AdAway/AdAway/releases[AdAway] is the alternative if you're not willing to change DNS servers, or using a paid VPN with no option to change the DNS servers used.
+
+* link:https://play.google.com/store/apps/details?id=com.qtrun.QuickTest[Network Signal Guru for band locking], which can help maintain reliable speeds, and/or avoid congested bands for higher speeds.
+
+
+*3: Kernel in use must have the "xt_HL.ko" module built-in (netfilter's TTL/HL packet mangling).*
+
+* Testing for "xt_HL.ko" support:
+. Launch Termux.
+. `$ su`
+. `# iptables -t mangle -A POSTROUTING -o null -j TTL --ttl-set 64`
+. `# ip6tables -t mangle -A POSTROUTING -o null -j HL --hl-set 64`
+** If there's no output, the commands succeeded (kernel has "xt_HL.ko" support).
+
+TIP: If your preferred custom kernel does not support `--ttl-set` and `--hl-set`, inform them of this repository. +
+ For kernel tweakers: link:https://web.archive.org/web/20210423030541/https://forum.xda-developers.com/t/magisk-stock-bypass-tether-restrictions.4262265/[an example of enabling "xt_HL.ko" support through Magisk].
+
+=== List of high-quality kernels with "xt_HL.ko" support, that also use the BBR TCP congestion control algorithm (which helps link:https://docs.google.com/spreadsheets/d/1I1NcVVbuC7aq4nGalYxMNz9pgS9OLKcFHssIBlj9xXI[maintains speeds over bad network conditions]):
+
+* kdrag0n's link:https://forum.xda-developers.com/search/member?user_id=7291478&content=thread[Proton Kernel].
+* Freak07's link:https://forum.xda-developers.com/search/member?user_id=3428502&content=thread[Kirisakura] kernel.
+
+NOTE: Search terms to use on link:https://forum.xda-developers.com/search/[XDA Forums] to find other kernels with "xt_HL.ko" support: +
+`TTL spoofing`, `TTL target`, `IPtables TTL`, `TTL/HL target`, `TTL module`.
+
+
+== 1. Skip to 2 if non-rooted: Configure props
 
 . Launch Termux.
 . `$ su`
 . `# settings delete system tether_entitlement_check_state; settings delete global tether_dun_required`
 . `# props`
-** "Select an option below." -> "Add/edit custom props" kbd:[4 ↵]
+** "Select an option below." -> "Add/edit custom props" kbd:[5 ↵]
 ** Select "New custom prop" with kbd:[n ↵]
 *** `net.tethering.noprovisioning` kbd:[↵] -> kbd:[true ↵] -> kbd:[y ↵]
 **** "Do you want to reboot now?" kbd:[n ↵]
 ** Select "New custom prop" with kbd:[n ↵]
-*** `tether_entitlement_check_state` kbd:[↵] -> kbd:[0 ↵] -> kbd:[y ↵]
+*** `tether_entitlement_check_state` kbd:[↵]
+**** "Are you sure you want to proceed?" kbd:[y ↵] -> kbd:[0 ↵] -> kbd:[y ↵]
 **** "Do you want to reboot now?" kbd:[n ↵]
 ** Select "New custom prop" with kbd:[n ↵]
 *** `tether_dun_required` kbd:[↵] -> kbd:[0 ↵] -> kbd:[y ↵]
 **** "Do you want to reboot now?" -> kbd:[y ↵]
 
-== 2. Adjust TTL & HL
 
-* Getting the correct network interface(s); look for 'rmnet' and/or 'rndis' (example: "v4-rmnet_data2").
-** `$ netstat -i`
+== 2. Spoof TTL & HL
 
-.Termux:Boot
+=== Router methods
+.Asuswrt-Merlin >unfinished, TODO<
 [%collapsible]
 ====
-* link:https://f-droid.org/en/packages/com.termux.boot/[Install Termux:Boot] and disable "battery optimizations" for Termux and Termux:Boot in your device's settings.
+. `WAN` -> disable `Extend the TTL value` and `Spoof LAN TTL value`.
+
+====
+
+.GoldenOrb & OpenWrt via LuCI
+[%collapsible]
+====
+. GoldenOrb specific: `Network` -> `Firewall` -> `Custom TTL Settings`
+** Ensure its option is disabled.
+. `Network` -> `Firewall` -> `Custom Rules`
+```
+iptables -t mangle -I PREROUTING -i usb+ -j TTL --ttl-inc 1
+iptables -t mangle -I POSTROUTING -o usb+ -j TTL --ttl-inc 1
+ip6tables -t mangle -I PREROUTING ! -p icmpv6 -i usb+ -j HL --hl-inc 1
+ip6tables -t mangle -I POSTROUTING ! -p icmpv6 -o usb+ -j HL --hl-inc 1
+```
+* Compare the TTL and HL of the tethering (Android) device and the router (or any device connected to that router), they should both be the same TTL and HL. If not, change the increment (ttl-inc, hl-inc).
+** IPv4/TTL: `$ ping -4 bing.com`
+*** For Android & macOS: `$ ping bing.com` 
+** IPv6/HL: `$ ping -6 bing.com`
+*** For Android & macOS: `$ ping6 bing.com`
+
+====
+
+NOTE: For unlisted firmwares, if you get TTL & HL spoofing functional, please edit README.adoc to include instructions for that firmware, then make a Pull Request once you're done. +
+As proof, provide a screenshot for each step of the new instructions.
+
+=== Rooted tether device
+
+* Show the currently used network interfaces; it's helpful for troubleshooting if needed.
+** `$ netstat -i`
+* link:https://f-droid.org/en/packages/com.termux.boot/[Install Termux:Boot].
+** Open Termux:Boot at least once, this allows it to run at boot while installed.
 
 * Make the script:
 . `$ mkdir -p ~/.termux/boot`
 . `$ cd ~/.termux/boot`
 . `$ nano set-tether-ttl.sh`
 
-NOTE: Replace "v4-rmnet_data2" with your network interface if it's different.
-
 [source, shell]
 ----
-#!/data/data/com.termux/files/usr/bin/sh
-su -c "iptables -t mangle -A POSTROUTING -o v4-rmnet_data2 -j TTL --ttl-set 64 && \ 
-ip6tables -t mangle -A POSTROUTING -o v4-rmnet_data2 -j HL --hl-set 64"
+#!/bin/sh
+su -c "iptables -t mangle -I PREROUTING -i v4-rmnet_data+ -j TTL --ttl-inc 1 && \
+iptables -t mangle -I POSTROUTING -o v4-rmnet_data+ -j TTL --ttl-inc 1 && \
+ip6tables -t mangle -I PREROUTING ! -p icmpv6 -i v4-rmnet_data+ -j HL --hl-inc 1 && \
+ip6tables -t mangle -I POSTROUTING ! -p icmpv6 -o v4-rmnet_data+ -j HL --hl-inc 1"
 ----
 
 * Launch the script:
 ** `$ chmod +x set-tether-ttl.sh && sh set-tether-ttl.sh`
 *** Termux:Boot will automatically run set-tether-ttl.sh after startup/boot, though it will break if the interface name changes, which I cannot test nor know if this happens on Android, and if it does it may be specific to a ROM.
 
-====
 
-.AFWall+ (will not work on ROMs with their own Firewall app, such as CalyxOS)
-[%collapsible]
-====
-* link:https://github.com/ukanth/afwall#availability[Install AFWall+]
+== 3. Check TTL & HL
 
-. Open AFWall+ -> 3 vertical dots (hamburger menu) -> `Preferences`
-- `UI Preferences`
-** `Confirm AFWall+ disable` -> Enabled
-- `Binaries`
-** `Iptables binary` -> System iptables
-** `BusyBox binary` -> System BusyBox
-. Open AFWall+ -> 3 vertical dots (hamburger menu) -> `Set custom script`
-. Put in "Enter custom script below": 
+* Do this for both the tethering device (Android), and a device being tethered to. 
+** If the TTL and/or HL isn't exactly the same as the tethering device, then modify the `ttl-inc` and `hl-inc` to match.
+*** inc = increment, dec = decrement; `ttl-inc 2` adds to the TTL by 2, `ttl-dec 1` subtracts the TTL by 1.
+* IPv4/TTL: `$ ping -4 bing.com`
+** For Android & macOS: `$ ping bing.com` 
+* IPv6/HL: `$ ping -6 bing.com`
+** For Android & macOS: `$ ping6 bing.com`
 
-NOTE: Replace "v4-rmnet_data2" with your network interface if it's different
+== 4. Confirm the tether is unthrottled
 
-[source]
-----
-iptables -t mangle -A POSTROUTING -o v4-rmnet_data2 -j TTL --ttl-set 64
-ip6tables -t mangle -A POSTROUTING -o v4-rmnet_data2 -j HL --hl-set 64
-----
-====
+NOTE: If your telecom doesn't charge $$ for going over the hotspot/tethering data limit, max out its cap before proceeding. +
+It helps make it easy to determine if this works, as some telecoms will use more tactics to ensure you're in line with how they want you to use their service.
 
-.For kernels with no "xt_HL.ko" support; not recommended
-[%collapsible]
-====
+. After the desired TTL is reached, use link:https://fast.com[Netflix's Speedtest]. This will test for throttling of streaming servers (Netflix), tethering/"hotspot data" detections, OS fingerprinting, DNS fingerprinting, >TODO<
 
-. Install then open link:https://play.google.com/store/apps/details?id=org.segin.ttleditor[TTL Editor].
-. Check "Apply to all network interfaces using /proc"...
-** Or specify a specific interface, "v4-rmnet_data2" being an example.
-. Press OK to the side of "Set new TTL" to apply a chosen TTL, likely 64.
-
-WARNING: TTL changes aren't persistent with this method, rebooting/shutdown will lose these changes until you apply them manually again.
-
-====
-
-== 3. Test TTL & HL change on the tethered device
-
-* IPv4 (test TTL): `$ ping -4 gnu.org`
-* IPv6 (test HL): `$ ping -6 gnu.org`
-
-If the TTL & HL is 64 (or what you know works for your telecom), then you've successfully completed this guide.
-
-TIP: If this works, then Star this repository! +
-- If this didn't work, try link:https://github.com/RiFi2k/unlimited-tethering[RiFi2k's guide]
+TIP: + If this guide worked, then Star this repository!

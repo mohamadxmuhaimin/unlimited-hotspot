@@ -28,7 +28,7 @@ endif::[]
 *** https://github.com/GrapheneOS/platform_build/commit/b22db418509758b781699898dc43c1c1d3a94999
 
 == Requirements can't be met
-Ignore this guide past this section, and try either of these choices...
+Ignore this guide past this section, and try these choices...
 
 * Using the link:https://github.com/krlvm/PowerTunnel-Android[PowerTunnel] anti-DPI app.
 ** You'd use PowerTunnel on tethered to devices by connecting to the transparent HTTP proxy provided by PowerTunnel on the tethering device.

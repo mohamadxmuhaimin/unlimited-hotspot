@@ -30,12 +30,14 @@ endif::[]
 == Requirements can't be met
 Ignore this guide past this section, and try either of these choices...
 
-* Anti-DPI apps such as link:https://github.com/zhenyolka/DPITunnel-android[DPI Tunnel] or link:https://github.com/krlvm/PowerTunnel-Android[PowerTunnel (less recommended)].
-** Note that you must install their software on every device which is tethered to, making the OS support limited. 
+* Using the link:https://github.com/krlvm/PowerTunnel-Android[PowerTunnel] anti-DPI app.
+** You'd use PowerTunnel on tethered to devices by connecting to the transparent HTTP proxy provided by PowerTunnel on the tethering device.
+*** There's no direct tutorials for this, and I'm planning to write one for it.
 ** This method makes it very obvious to a telecom that you intentionally bypassed their restrictions and/or throttling.
 * link:https://github.com/RiFi2k/unlimited-tethering[RiFi2k's SSH tunneling guide].
 ** This method isn't obvious to telecoms, but can drastically lower speed on low-end CPUs (CPU matters heavily for both the tethering device, and the tethered to devices), and will add additional bufferbloat.
-
+* Sell your current phone or tablet on Swappa or other marketplaces, then use that money towards buying a bootloader unlocked device. The best choice to buy for the money would be an unlocked Google Pixel phone in Mint condition from Swappa (no older than the Pixel 4 XL as of 2022).
+** Make sure to check the desired phone's band support at link:https://www.kimovil.com/en/[Kimovil] to ensure support for your telecom before buying it, and be sure to look at the "Aliases" of your desired phone on Kimovil for each region to avoid the trap of buying a Global phone that doesn't support the LTE bands you need for your United States telecom as an example.
 
 == Introduction
 
@@ -94,7 +96,7 @@ NOTE: Root allows for: +
 * More consistent and potentially much higher network speeds.
 
 WARNING: Root comes at the cost of security; do not leave important content (files, logins...) on a rooted device. +
-If you plan on using an old phone or tablet as the rooted tethering device, check its  bands and LTE category at link:https://cacombos.com[Bands & Combos]; if its LTE category is 6 or lower, don't expect good network speeds from that device for any guide.
+If you plan on using an old phone or tablet as the rooted tethering device, check its bands and LTE category at link:https://cacombos.com[Bands & Combos]; if its LTE category is 6 or lower, don't expect good network speeds from that device for any guide.
 
 *1: link:https://topjohnwu.github.io/Magisk/[Install Magisk], then the link:https://github.com/Magisk-Modules-Repo/MagiskHidePropsConf#installation[MagiskHide Props Config] module.*
 

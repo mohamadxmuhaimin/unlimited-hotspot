@@ -39,7 +39,7 @@ Ignore this guide past this section, and try these choices...
 ** This method isn't obvious to telecoms, but can drastically lower speed on low-end CPUs (CPU matters heavily for both the tethering device, and the tethered to devices), and will add additional bufferbloat.
 
 * Get an unlocked Google Pixel phone (off Swappa if possible) that has at least 2 years left of guaranteed software updates; link:https://endoflife.date/pixel[check that here]. 
-** If you plan to sell your current phone or tablet, use Swappa or Gab/Facebook Marketplace; avoid Ebay and Mercari.
+** If you plan to sell your current phone or tablet from the United States, use Swappa or Gab/Facebook Marketplace; avoid Ebay and Mercari, they have high fees and the probability of getting scammed is much higher.
 ** Make sure to check the desired phone's band support at link:https://www.kimovil.com/en/[Kimovil] to ensure support for your telecom before buying it, and be sure to look at the "Aliases" of your desired phone on Kimovil for each region to avoid the trap of buying a Global phone that doesn't support the LTE bands you need for your United States telecom as an example.
 
 == Introduction
@@ -62,17 +62,14 @@ NOTE: Enabling "Data Saver" while USB tethering is recommended to make Android r
 ** link:https://www.vpngate.net/en/[VPN Gate]
 *** Potentially fast depending on the server chosen, and supports the SoftEther protocol.
 
-* VPN protocol comparison:
+* VPN protocol comparison (only for protocols worth using):
 ** *WireGuard*, the fastest on reliable internet, but is easily detected by DPI firewalls.
-** *IKEv2/IPSec*, sometimes faster than WireGuard on unreliable internet. Depending on the VPN provider, IKEv2 can either be resistant to DPI firewalls, or not at all.
+** *IKEv2/IPSec*, sometimes faster than WireGuard on unreliable internet. Depending on the VPN provider, IKEv2 can either be resistant to DPI firewalls (hide.me's implementation), or not at all.
 ** *SoftEther*, bypasses DPI firewalls easily with good speeds in general, but is more complicated to setup for non-Windows OSes.
 ** *OpenVPN3*, resistant to DPI firewalls (outside of China, Iran, and Egypt; unless OpenVPN over SSL is used, which impacts speeds greatly and increases bufferbloat further) if tls-crypt is used alongside port 443. This protocol isn't efficient and has bufferbloat issues; OpenVPN3 makes great strides in improving its situation, but is still inferior to other choices here.
-** *L2TP/IPSec*, never worth using.
-** *PPTP*, if a VPN has this option, they aren't even pretending to care about your security and privacy. Never worth using.
-* If the speeds are lower than expected on all protocols, connect to the VPN on a device that hardware accelerates the cryptography used, such as link:https://web.archive.org/web/20220314000051/https://wikiless.org/wiki/AES_instruction_set?lang=en[AES-NI] for x86_64 processors.
 
 .*Good paid VPN providers do the following:*
-. Transparent communication, alongside easily accessible forums. A Discord "guild" may count for some; personally, I loathe using Discord.
+. Transparent communication, alongside either easily accessible forums, a Discord "server"/guild, a Telegram channel/group, or a Matrix channel.
 . Only bare-metal (dedicated) servers used, with no hard drives (RAM only).
 
 ** Bare-metal is faster and more secure than virtual servers ("VPS" / "VDS"), as that machine isn't shared between multiple unaffiliated people.
@@ -82,13 +79,13 @@ NOTE: Enabling "Data Saver" while USB tethering is recommended to make Android r
 ** P2P should never be blocked, despite also being abuse-prone.
 . Ability to link:https://airvpn.org/faq/port_forwarding/[select ports to forward]; this heavily gauges if a VPN provider is good, even if you never need port forwarding.
 
-** AirVPN, hide.me (uses UPnP; not selecting specific ports), Mullvad, and TorGuard have the best implementations of port forwarding as of 31 December 2021.
+** AirVPN, hide.me (uses UPnP; not selecting specific ports), and Mullvad have the best implementations of port forwarding as of 31 December 2021.
 *** link:https://web.archive.org/web/20220313235113/https://teddit.net/r/VPNTorrents/comments/s9f36q/list_of_vpns_that_allow_portforwarding_2022/[List of VPNs that allow Port Forwarding].
 . SoftEther protocol support.
-. No PPTP protocol support.
+. No PPTP protocol support; PPTP has no security.
 . If the OpenVPN protocol is supported, its tls-crypt must be supported and for the VPN provider to allow establishing connection to their servers via port 443.
 
-** OpenVPN over SSL or SSH is mandatory to use OpenVPN for China, Iran, and Egypt.
+** OpenVPN over SSL or SSH is mandatory for China, Iran, and Egypt.
 . Full IPv4 and IPv6 support across all servers.
 ** On some telecoms, connecting to a VPN server through IPv6 is required.
 
@@ -110,13 +107,13 @@ If you plan on using an old phone or tablet as the rooted tethering device, chec
 *2: Install the following apps; if needed, use the link:https://gitlab.com/AuroraOSS/AuroraStore/-/releases[Aurora Store] app for installing apps located on the Google Play Store.*
 
 * The link:https://f-droid.org/en/packages/com.termux/[Termux] terminal emulator (link:https://wiki.termux.com/wiki/Termux_Google_Play[from F-Droid only]).
-** If checking for Termux app updates is desired, use link:https://github.com/Iamlooker/Droid-ify/releases[Droid-ify] instead of the official F-Droid app (which is unreliable and uses outdated Android APIs, lessening the security of their app).
+** If checking for Termux app updates is desired, use link:https://github.com/NeoApplications/Neo-Store/releases[Neo Store] instead of the official F-Droid app (which is unreliable and uses outdated Android APIs, lessening the security of their app).
 
 * link:https://play.google.com/store/apps/details?id=com.draco.ktweak[KTweak for higher network speeds], using its "throughput" profile.
 
 * link:https://play.google.com/store/apps/details?id=com.qtrun.QuickTest[Network Signal Guru for band locking], which can help maintain reliable speeds, and/or avoid congested bands for higher speeds.
 ** link:https://adguard-dns.com/en/public-dns.html[Configure AdGuard DNS manually] before using Network Signal Guru.
-*** link:https://github.com/AdAway/AdAway/releases[AdAway] is the alternative if you're not willing to change DNS servers, or using a paid VPN (on tethered to devices; outside of the tethering device, since only one VPN can be used at a time on Android) with no option to change the DNS servers used.
+*** link:https://github.com/AdAway/AdAway/releases[AdAway] is the alternative if you're not willing to change DNS servers, or using a paid VPN (on the tethering device) that has no option to change the DNS servers it uses.
 
 *3: Kernel in use must have the "xt_HL.ko" module built-in (netfilter's TTL/HL packet mangling).*
 
@@ -178,7 +175,6 @@ NOTE: For dual (or more) router setups, each router has to apply TTL/HL spoofing
 [source, shell]
 ----
 #!/bin/sh
-# wan-event
 # Martineau wrote this script
 # See https://www.snbforums.com/threads/wan-start-script-also-run-on-wan-stop.61295/#post-542636
 #
@@ -313,12 +309,13 @@ Do this for both the tethering device, and the devices being tethered to.
 
 == 4. Confirm the tethering is unthrottled
 
-NOTE: If your telecom doesn't charge $$ for going over the hotspot/tethering data limit, max out its cap before proceeding. +
+NOTE: If your telecom doesn't charge $$$ for going over the hotspot/tethering data limit, max out its cap before proceeding. +
 It'll make it easy to determine if this works, as after maxing the cap, some telecoms will use more tactics to ensure you're in line with how they want you to use their service.
 
 * Disconnect from any VPNs.
 * Use link:https://fast.com[Netflix's Speedtest], then after that's complete use link:https://www.waveform.com/tools/bufferbloat[Waveform's Bufferbloat Test]. This will test for throttling of streaming servers (Netflix), various forms of fingerprinting, and tethering/hotspot detections.
 * Connect to a VPN, then repeat the above step.
+** If the speeds are lower than expected on all VPN protocols, connect to the VPN on a device that hardware accelerates the cryptography used, such as link:https://web.archive.org/web/20220314000051/https://wikiless.org/wiki/AES_instruction_set?lang=en[AES-NI] for x86_64 processors.
 
 NOTE: If the VPN can't connect, first check if IPv4 or IPv6 is being used to reach the VPN server; on T-Mobile, connecting through IPv6 may be required. +
 If the VPN still can't connect, change its protocol used in this order: +

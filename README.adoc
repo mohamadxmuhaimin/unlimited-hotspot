@@ -36,11 +36,11 @@ Ignore this guide past this section, and try these choices...
 ** This method makes it very obvious to a telecom that you intentionally bypassed their restrictions and/or throttling.
 
 * link:https://github.com/RiFi2k/unlimited-tethering[RiFi2k's SSH tunneling guide].
-** This method isn't obvious to telecoms, but can drastically lower speed on low-end CPUs (CPU matters heavily for both the tethering device, and the tethered to devices), and will add additional bufferbloat.
+** This method isn't obvious to telecoms, but can drastically lower speed on low-end CPUs (CPU matters heavily for both the tethering device, and the tethered to devices), and will add additional link:https://www.waveform.com/tools/bufferbloat[bufferbloat].
 
-* Get an unlocked Google Pixel phone (off Swappa if possible) that has at least 2 years left of guaranteed software updates; link:https://endoflife.date/pixel[check that here]. 
-** If you plan to sell your current phone or tablet from the United States, use Swappa or Gab/Facebook Marketplace; avoid Ebay and Mercari, they have high fees and the probability of getting scammed is much higher.
-** Make sure to check the desired phone's band support at link:https://www.kimovil.com/en/[Kimovil] to ensure support for your telecom before buying it, and be sure to look at the "Aliases" of your desired phone on Kimovil for each region to avoid the trap of buying a Global phone that doesn't support the LTE bands you need for your United States telecom as an example.
+* Get an unlocked Google Pixel phone (off Swappa if possible) which supports all radio bands of your telecom; link:https://www.kimovil.com/en/[check that at Kimovil]. The recommendation as of 7 June 2022 is a link:https://swappa.com/buy/used/google-pixel-4a-5g/unlocked[Pixel 4a (5G)].
+** Check the desired phone's band support at link:https://www.kimovil.com/en/[Kimovil] to ensure support for your telecom before buying it. Also look at the "Aliases" of your desired phone on Kimovil for each region to avoid buying a Global phone that doesn't support the bands your theoretical United States telecom requires.
+
 
 == Introduction
 
@@ -124,13 +124,13 @@ If you plan on using an old phone or tablet as the rooted tethering device, chec
 . `# ip6tables -t mangle -A POSTROUTING -o null -j HL --hl-inc 1`
 ** If there's no output, the commands succeeded (kernel has "xt_HL.ko" support).
 
-=== List of kernels with "xt_HL.ko" support, and use the BBR or BBRv2 TCP congestion control algorithm to help link:https://web.archive.org/web/20220313173158/http://web.archive.org/screenshot/https://docs.google.com/spreadsheets/d/1I1NcVVbuC7aq4nGalYxMNz9pgS9OLKcFHssIBlj9xXI[maintain speeds over bad network conditions]:
-
-NOTE: Try these in order.
-
-. momojuro's link:https://forum.xda-developers.com/search/member?user_id=5670369&content=thread[fsociety tribute] kernel.
-. kdrag0n's link:https://forum.xda-developers.com/search/member?user_id=7291478&content=thread[Proton Kernel].
-. Freak07's link:https://forum.xda-developers.com/search/member?user_id=3428502&content=thread[Kirisakura] kernel.
+|===
+| Kernels with "xt_HL.ko" support, and use the BBR or BBRv2 TCP congestion control algorithm to help link:https://web.archive.org/web/20220313173158/http://web.archive.org/screenshot/https://docs.google.com/spreadsheets/d/1I1NcVVbuC7aq4nGalYxMNz9pgS9OLKcFHssIBlj9xXI[maintain speeds over bad network conditions]:
+| 1. momojuro's link:https://forum.xda-developers.com/search/member?user_id=5670369&content=thread[fsociety tribute] kernel. +
+-> I made a complete guide for this kernel here: https://github.com/nermur/pixel-tether-setup
+| 2. kdrag0n's link:https://forum.xda-developers.com/search/member?user_id=7291478&content=thread[Proton Kernel].
+| 3. Freak07's link:https://forum.xda-developers.com/search/member?user_id=3428502&content=thread[Kirisakura] kernel.
+|===
 
 TIP: Search terms to use on link:https://forum.xda-developers.com/search/[XDA Forums] to find other kernels with "xt_HL.ko" support: +
 `TTL spoofing`, `TTL target`, `IPtables TTL`, `TTL/HL target`, `TTL module`.

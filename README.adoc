@@ -56,11 +56,15 @@ NOTE: Enabling "Data Saver" while USB tethering is recommended to make Android r
 
 == Using a VPN is likely required
 
+WARNING: Do not torrent on free VPN services.
+
 * Free, fast, and non-malicious VPN services:
-** link:https://cloudflarewarp.com/[Cloudflare WARP]
+** link:https://cloudflarewarp.com/[Cloudflare WARP]; you can get the link:https://github.com/TheCaduceus/WARP-UNLIMITED-ADVANCED[paid WARP+ for free], in which the "Railway App" method is recommended.
 *** Some telecoms may block this due to using the WireGuard protocol.
 ** link:https://www.vpngate.net/en/[VPN Gate]
 *** Potentially fast depending on the server chosen, and supports the SoftEther protocol.
+** https://protonvpn.com/free-vpn/[ProtonVPN Free]
+*** Their link:https://protonvpn.com/vpn-servers/[paid version] is bad; P2P is not allowed all on servers, no more than 1 port can be forwarded (also exclusive to the WireGuard protocol), and they will hog up your time if you attempt a refund.
 
 * VPN protocol comparison (only for protocols worth using):
 ** *WireGuard*, the fastest on reliable internet, but is easily detected by DPI firewalls.
@@ -76,13 +80,15 @@ NOTE: Enabling "Data Saver" while USB tethering is recommended to make Android r
 . State all their geolocated (fake) server locations, or have none.
 . All server locations allow all traffic except outbound port 25.
 
-** P2P should never be blocked, despite also being abuse-prone.
-. Ability to link:https://airvpn.org/faq/port_forwarding/[select ports to forward]; this heavily gauges if a VPN provider is good, even if you never need port forwarding.
+** P2P/link:http://www.bittorrent.org/introduction.html[BitTorrent protocol] should never be blocked, despite also being abuse-prone.
 
-** AirVPN, hide.me (uses UPnP; not selecting specific ports), and Mullvad have the best implementations of port forwarding as of 31 December 2021.
-*** link:https://web.archive.org/web/20220313235113/https://teddit.net/r/VPNTorrents/comments/s9f36q/list_of_vpns_that_allow_portforwarding_2022/[List of VPNs that allow Port Forwarding].
+. Ability to link:https://airvpn.org/faq/port_forwarding/[select at least 5 ports to forward] while supporting IPv6; this heavily gauges if a VPN provider is good, even if you never need port forwarding.
+** link:https://web.archive.org/web/20220731172057/https://teddit.net/r/VPNTorrents/comments/s9f36q/list_of_vpns_that_allow_portforwarding_2022/[List of VPNs that support Port Forwarding].
+
 . SoftEther protocol support.
+
 . No PPTP protocol support; PPTP has no security.
+
 . If the OpenVPN protocol is supported, its tls-crypt must be supported and for the VPN provider to allow establishing connection to their servers via port 443.
 
 ** OpenVPN over SSL or SSH is mandatory for China, Iran, and Egypt.
@@ -94,10 +100,10 @@ NOTE: Enabling "Data Saver" while USB tethering is recommended to make Android r
 
 TIP: If staying non-rooted, skip to <<2. Spoof TTL & HL>>.
 
-NOTE: Root allows for: +
-* Correctly spoofing TTL & HL for every tethered to device, without a need to spoof on the tethered to device separately. +
--> Routers however still require their own separate spoofed TTL & HL. +
-* More consistent and potentially much higher network speeds.
+* Root allows for:
+** Correctly spoofing TTL & HL for every tethered to device, without a need to spoof on the tethered to device separately. +
+-> Routers however still require their own separate spoofed TTL & HL.
+** More consistent and potentially much higher network speeds.
 
 WARNING: Root comes at the cost of security; do not leave important content (files, logins...) on a rooted device. +
 If you plan on using an old phone or tablet as the rooted tethering device, check its bands and LTE category at link:https://cacombos.com[Bands & Combos]; if its LTE category is 6 or lower, don't expect good network speeds from that device for any guide.

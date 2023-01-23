@@ -8,143 +8,72 @@ ifdef::env-github[]
 :warning-caption: :warning:
 endif::[]
 
-.Learning resources used
-[%collapsible]
-====
-
-* Read these in order if interested:
-. https://archive.org/download/p173_20220313/p173.pdf
-. https://archive.org/download/technology-showcase-policy-control-for-connected-and-tethered-devices/technology-showcase-policy-control-for-connected-and-tethered-devices.pdf
-. https://archive.org/download/geneva_ccs19/geneva_ccs19.pdf
-
-====
-
-
 == Requirements
-* An Android 9 (or newer) device with an active SIM card.
-** Older Android versions may need modifications for the Termux TTL & HL script shown later in this guide at "<<Rooted tether device>>".
-* If not rooted, the ROM must explicitly stop Android from snitching:
-*** https://github.com/GrapheneOS/platform_frameworks_base/commit/d4e03e77dd590e3ed89af8b72d5c09f875fc46b0
-*** https://github.com/GrapheneOS/platform_build/commit/b22db418509758b781699898dc43c1c1d3a94999
+* A rooted Android device with an active SIM card.
+
 
 == Requirements can't be met
-Ignore this guide past this section, and try these choices...
-
-* Using the link:https://github.com/krlvm/PowerTunnel-Android[PowerTunnel] anti-DPI app.
-** You'd use PowerTunnel on tethered to devices by connecting to the transparent HTTP proxy provided by PowerTunnel on the tethering device.
-*** There's no direct tutorials for this, and I'm planning to write one for it.
-** This method makes it very obvious to a telecom that you intentionally bypassed their restrictions and/or throttling.
-
-* link:https://github.com/RiFi2k/unlimited-tethering[RiFi2k's SSH tunneling guide].
-** This method isn't obvious to telecoms, but can drastically lower speed on low-end CPUs (CPU matters heavily for both the tethering device, and the tethered to devices), and will add additional link:https://www.waveform.com/tools/bufferbloat[bufferbloat].
-
-* Get an unlocked Google Pixel phone (off Swappa if possible) which supports all radio bands of your telecom; link:https://www.kimovil.com/en/[check that at Kimovil]. The recommendation as of 7 June 2022 is a link:https://swappa.com/buy/used/google-pixel-4a-5g/unlocked[Pixel 4a (5G)].
-** Check the desired phone's band support at link:https://www.kimovil.com/en/[Kimovil] to ensure support for your telecom before buying it. Also look at the "Aliases" of your desired phone on Kimovil for each region to avoid buying a Global phone that doesn't support the bands your theoretical United States telecom requires.
+* Get an unlocked Google Pixel phone that support all radio bands of your telecom.
+** Use link:https://www.kimovil.com/en/[Kimovil] to check radio band support. Note that the same phone from different countries have different bands supported.
+** The recommendation is a link:https://swappa.com/buy/used/google-pixel-4a-5g/unlocked[Pixel 4a (5G)] for $100 USD off Swappa instead of Ebay due to their human review of listings, and requirements imposed on sellers to prevent scams or false advertising.
 
 
 == Introduction
 
-.This guide is for bypassing firewalls utilizing Deep Packet Inspection (DPI), which are used to throttle & tamper with tethering/hotspot data, and enact censorship for some; the three other main goals with this guide are:
-* Minor or no (download & upload) speed reduction and no increase in bufferbloat, unlike the SSH or SSL tunneling methods.
-* Making it difficult for telecoms to prove intentional bypassing of their tethering detections, and consequently their DPI firewall.
-* Must work for as many tethered to devices as possible.
-** Currently not met due to a lack of instructions for OS specific TTL & HL spoofing (for those using a non-rooted tethering device), and needs instructions for more router firmwares.
+.Goals:
+* Least amount of speed reduction with no increase in link:https://www.waveform.com/tools/bufferbloat[bufferbloat]; unlike the link:https://github.com/RiFi2k/unlimited-tethering[sshuttle method].
 
-NOTE: Enabling "Data Saver" while USB tethering is recommended to make Android restrict data to USB tethering and what app is at the forefront only. +
--> If WiFi/Hotspot tethering is used, Android will forcefully disable "Data Saver".
+* Difficult for telecoms to prove intentional bypassing of their  DPI firewall and tethering detections; unlike the link:https://github.com/krlvm/PowerTunnel-Android[PowerTunnel method].
 
+* Fully bypassing DPI (Deep Packet Inspection); used to throttle & tamper with sites such as Netflix or YouTube (to force a low resolution like 480p), and sometimes censorship.
+** A good VPN is required for this goal.
 
-== Using a VPN is likely required
-
-WARNING: Do not torrent on free VPN services.
-
-* Free, fast, and non-malicious VPN services:
-** link:https://cloudflarewarp.com/[Cloudflare WARP]; you can get the link:https://github.com/TheCaduceus/WARP-UNLIMITED-ADVANCED[paid WARP+ for free], in which the "Railway App" method is recommended.
-*** Some telecoms may block this due to using the WireGuard protocol.
-** link:https://www.vpngate.net/en/[VPN Gate]
-*** Potentially fast depending on the server chosen, and supports the SoftEther protocol.
-** https://protonvpn.com/free-vpn/[ProtonVPN Free]
-*** Their link:https://protonvpn.com/vpn-servers/[paid version] is bad; P2P is not allowed all on servers, no more than 1 port can be forwarded (also exclusive to the WireGuard protocol), and they will hog up your time if you attempt a refund.
-
-* VPN protocol comparison (only for protocols worth using):
-** *WireGuard*, the fastest on reliable internet, but is easily detected by DPI firewalls.
-** *IKEv2/IPSec*, sometimes faster than WireGuard on unreliable internet. Depending on the VPN provider, IKEv2 can either be resistant to DPI firewalls (hide.me's implementation), or not at all.
-** *SoftEther*, bypasses DPI firewalls easily with good speeds in general, but is more complicated to setup for non-Windows OSes.
-** *OpenVPN3*, resistant to DPI firewalls (outside of China, Iran, and Egypt; unless OpenVPN over SSL is used, which impacts speeds greatly and increases bufferbloat further) if tls-crypt is used alongside port 443. This protocol isn't efficient and has bufferbloat issues; OpenVPN3 makes great strides in improving its situation, but is still inferior to other choices here.
-
-.*Good paid VPN providers do the following:*
-. Transparent communication, alongside either easily accessible forums, a Discord "server"/guild, a Telegram channel/group, or a Matrix channel.
-. Only bare-metal (dedicated) servers used, with no hard drives (RAM only).
-
-** Bare-metal is faster and more secure than virtual servers ("VPS" / "VDS"), as that machine isn't shared between multiple unaffiliated people.
-. State all their geolocated (fake) server locations, or have none.
-. All server locations allow all traffic except outbound port 25.
-
-** P2P/link:http://www.bittorrent.org/introduction.html[BitTorrent protocol] should never be blocked, despite also being abuse-prone.
-
-. Ability to link:https://airvpn.org/faq/port_forwarding/[select at least 5 ports to forward] while supporting IPv6; this heavily gauges if a VPN provider is good, even if you never need port forwarding.
-** link:https://web.archive.org/web/20220731172057/https://teddit.net/r/VPNTorrents/comments/s9f36q/list_of_vpns_that_allow_portforwarding_2022/[List of VPNs that support Port Forwarding].
-
-. SoftEther protocol support.
-
-. No PPTP protocol support; PPTP has no security.
-
-. If the OpenVPN protocol is supported, its tls-crypt must be supported and for the VPN provider to allow establishing connection to their servers via port 443.
-
-** OpenVPN over SSL or SSH is mandatory for China, Iran, and Egypt.
-. Full IPv4 and IPv6 support across all servers.
-** On some telecoms, connecting to a VPN server through IPv6 is required.
+* Works for as many tethered to devices as possible.
 
 
-== Rooted requirements
+== Preparation
 
-TIP: If staying non-rooted, skip to <<2. Spoof TTL & HL>>.
+. link:https://topjohnwu.github.io/Magisk/[Install Magisk], then the link:https://github.com/Magisk-Modules-Repo/MagiskHidePropsConf#installation[MagiskHide Props Config] module.
 
-* Root allows for:
-** Correctly spoofing TTL & HL for every tethered to device, without a need to spoof on the tethered to device separately. +
--> Routers however still require their own separate spoofed TTL & HL.
-** More consistent and potentially much higher network speeds.
+. Install the following apps:
 
-WARNING: Root comes at the cost of security; do not leave important content (files, logins...) on a rooted device. +
-If you plan on using an old phone or tablet as the rooted tethering device, check its bands and LTE category at link:https://cacombos.com[Bands & Combos]; if its LTE category is 6 or lower, don't expect good network speeds from that device for any guide.
+* The link:https://f-droid.org/en/packages/com.termux/[Termux] terminal emulator (link:https://wiki.termux.com/wiki/Termux_Google_Play[from F-Droid only]), and link:https://f-droid.org/en/packages/com.termux.boot/[Termux:Boot].
+** Run Termux:Boot once before continuing.
 
-*1: link:https://topjohnwu.github.io/Magisk/[Install Magisk], then the link:https://github.com/Magisk-Modules-Repo/MagiskHidePropsConf#installation[MagiskHide Props Config] module.*
+* link:https://apkpure.com/network-signal-guru/com.qtrun.QuickTest[Network Signal Guru for band locking], which can help maintain reliable speeds, and/or avoid congested bands for higher speeds.
+** Enable "Systemless Hosts" in Magisk's settings, then install link:https://github.com/AdAway/AdAway/releases[AdAway]; use its root method before running Network Signal Guru to successfully block their advertising permanently (while AdAway is installed).
 
-*2: Install the following apps; if needed, use the link:https://gitlab.com/AuroraOSS/AuroraStore/-/releases[Aurora Store] app for installing apps located on the Google Play Store.*
-
-* The link:https://f-droid.org/en/packages/com.termux/[Termux] terminal emulator (link:https://wiki.termux.com/wiki/Termux_Google_Play[from F-Droid only]).
-** If checking for Termux app updates is desired, use link:https://github.com/NeoApplications/Neo-Store/releases[Neo Store] instead of the official F-Droid app (which is unreliable and uses outdated Android APIs, lessening the security of their app).
-
-* link:https://play.google.com/store/apps/details?id=com.draco.ktweak[KTweak for higher network speeds], using its "throughput" profile.
-
-* link:https://play.google.com/store/apps/details?id=com.qtrun.QuickTest[Network Signal Guru for band locking], which can help maintain reliable speeds, and/or avoid congested bands for higher speeds.
-** link:https://adguard-dns.com/en/public-dns.html[Configure AdGuard DNS manually] before using Network Signal Guru.
-*** link:https://github.com/AdAway/AdAway/releases[AdAway] is the alternative if you're not willing to change DNS servers, or using a paid VPN (on the tethering device) that has no option to change the DNS servers it uses.
-
-*3: Kernel in use must have the "xt_HL.ko" module built-in (netfilter's TTL/HL packet mangling).*
-
-* Testing for "xt_HL.ko" support:
-. Launch Termux.
+___
+. Kernel in use must have the "xt_HL.ko" module built-in (netfilter's TTL/HL packet mangling); to test, run Termux:
 . `$ su`
-. `# iptables -t mangle -A POSTROUTING -o null -j TTL --ttl-inc 1`
-. `# ip6tables -t mangle -A POSTROUTING -o null -j HL --hl-inc 1`
-** If there's no output, the commands succeeded (kernel has "xt_HL.ko" support).
+. `# iptables -t mangle -A POSTROUTING -o null -j TTL --ttl-inc 1; ip6tables -t mangle -A POSTROUTING -o null -j HL --hl-inc 1`
+** If there's no output, the kernel successfully has "xt_HL.ko" support.
+
+=== Installing a suitable custom kernel:
+* We're looking for:
+. Kernels with the BBR or BBRv2 TCP congestion control algorithm to link:https://web.archive.org/web/20220313173158/http://web.archive.org/screenshot/https://docs.google.com/spreadsheets/d/1I1NcVVbuC7aq4nGalYxMNz9pgS9OLKcFHssIBlj9xXI[help maintain speeds over bad network conditions].
+. "xt_HL.ko" support.
 
 |===
-| Kernels with "xt_HL.ko" support, and use the BBR or BBRv2 TCP congestion control algorithm to help link:https://web.archive.org/web/20220313173158/http://web.archive.org/screenshot/https://docs.google.com/spreadsheets/d/1I1NcVVbuC7aq4nGalYxMNz9pgS9OLKcFHssIBlj9xXI[maintain speeds over bad network conditions]:
-| 1. momojuro's link:https://forum.xda-developers.com/search/member?user_id=5670369&content=thread[fsociety tribute] kernel. +
--> I made a complete guide for this kernel here: https://github.com/nermur/pixel-tether-setup
-| 2. kdrag0n's link:https://forum.xda-developers.com/search/member?user_id=7291478&content=thread[Proton Kernel].
-| 3. Freak07's link:https://forum.xda-developers.com/search/member?user_id=3428502&content=thread[Kirisakura] kernel.
+| Known good custom kernels:
+| 1. momojuro's link:https://forum.xda-developers.com/search/member?user_id=5670369&content=thread[fsociety tribute] kernel; recommended for the Pixel 4A (5G) and Pixel 5.
+| 2. Freak07's link:https://forum.xda-developers.com/search/member?user_id=3428502&content=thread[Kirisakura] kernel; recommended for the Pixel 6.
+| 3. kdrag0n's link:https://forum.xda-developers.com/search/member?user_id=7291478&content=thread[Proton Kernel].
 |===
 
 TIP: Search terms to use on link:https://forum.xda-developers.com/search/[XDA Forums] to find other kernels with "xt_HL.ko" support: +
 `TTL spoofing`, `TTL target`, `IPtables TTL`, `TTL/HL target`, `TTL module`.
 
 
-== 1. Configure props
+* Installing a custom kernel:
+. Install link:https://f-droid.org/en/packages/com.smartpack.busyboxinstaller/[BusyBox].
+. Install link:https://apkmody.io/apps/franco-kernel-manager-apk/download[Franco Kernel Manager].
+. Run Franco Kernel Manager and go to "Flasher", from there the kernel can be flashed/installed.
 
-. Launch Termux.
+
+== 1. Block Android's snitching
+
+. Run Termux.
 . `$ su`
 . `# settings delete system tether_entitlement_check_state; settings delete global tether_dun_required`
 . `# props`
@@ -163,10 +92,33 @@ TIP: Search terms to use on link:https://forum.xda-developers.com/search/[XDA Fo
 
 == 2. Spoof TTL & HL
 
-NOTE: For dual (or more) router setups, each router has to apply TTL/HL spoofing of its own.
+. Show the currently used network interfaces; it's helpful for troubleshooting if needed.
+** `$ netstat -i`
+** Open Termux:Boot at least once, this allows it to run at boot while installed.
+
+. Make the script:
+** `$ mkdir -p ~/.termux/boot`
+** `$ cd ~/.termux/boot`
+** `$ nano set-tether-ttl.sh`
+
+[source, shell]
+----
+#!/bin/sh
+su -c "iptables -t mangle -D PREROUTING -i v4-rmnet_data+ -j TTL --ttl-inc 1 && \
+iptables -t mangle -D POSTROUTING -o v4-rmnet_data+ -j TTL --ttl-inc 1 && \
+ip6tables -t mangle -D PREROUTING ! -p icmpv6 -i v4-rmnet_data+ -j HL --hl-inc 1 && \
+ip6tables -t mangle -D POSTROUTING ! -p icmpv6 -o v4-rmnet_data+ -j HL --hl-inc 1
+iptables -t mangle -I PREROUTING -i v4-rmnet_data+ -j TTL --ttl-inc 1 && \
+iptables -t mangle -I POSTROUTING -o v4-rmnet_data+ -j TTL --ttl-inc 1 && \
+ip6tables -t mangle -I PREROUTING ! -p icmpv6 -i v4-rmnet_data+ -j HL --hl-inc 1 && \
+ip6tables -t mangle -I POSTROUTING ! -p icmpv6 -o v4-rmnet_data+ -j HL --hl-inc 1"
+----
+
+* Run the script:
+** `$ chmod +x set-tether-ttl.sh && sh set-tether-ttl.sh`
 
 
-=== Router methods
+=== For routers, additional steps are required.
 .Asuswrt-Merlin
 [%collapsible]
 ====
@@ -217,7 +169,7 @@ fi
 ----
 #!/bin/sh
 
-# HACK: Not sure what to check for exactly; do it too early and the TTL & HL don't get set.
+# HACK: Not sure what to check for exactly; do it too early and the TTL & HL won't get set.
 sleep 5s
 
 modprobe xt_HL; wait
@@ -268,37 +220,6 @@ ip6tables -t mangle -I POSTROUTING ! -p icmpv6 -o usb+ -j HL --hl-inc 2
 ___
 ====
 
-NOTE: For unlisted router firmwares, if you get TTL & HL spoofing functional, please edit README.adoc to include instructions for that firmware, then make a Pull Request once you're done.
-
-=== Rooted tether device
-
-* Show the currently used network interfaces; it's helpful for troubleshooting if needed.
-** `$ netstat -i`
-* link:https://f-droid.org/en/packages/com.termux.boot/[Install Termux:Boot].
-** Open Termux:Boot at least once, this allows it to run at boot while installed.
-
-* Make the script:
-. `$ mkdir -p ~/.termux/boot`
-. `$ cd ~/.termux/boot`
-. `$ nano set-tether-ttl.sh`
-
-[source, shell]
-----
-#!/bin/sh
-su -c "iptables -t mangle -D PREROUTING -i v4-rmnet_data+ -j TTL --ttl-inc 1 && \
-iptables -t mangle -D POSTROUTING -o v4-rmnet_data+ -j TTL --ttl-inc 1 && \
-ip6tables -t mangle -D PREROUTING ! -p icmpv6 -i v4-rmnet_data+ -j HL --hl-inc 1 && \
-ip6tables -t mangle -D POSTROUTING ! -p icmpv6 -o v4-rmnet_data+ -j HL --hl-inc 1
-iptables -t mangle -I PREROUTING -i v4-rmnet_data+ -j TTL --ttl-inc 1 && \
-iptables -t mangle -I POSTROUTING -o v4-rmnet_data+ -j TTL --ttl-inc 1 && \
-ip6tables -t mangle -I PREROUTING ! -p icmpv6 -i v4-rmnet_data+ -j HL --hl-inc 1 && \
-ip6tables -t mangle -I POSTROUTING ! -p icmpv6 -o v4-rmnet_data+ -j HL --hl-inc 1"
-----
-
-* Launch the script:
-** `$ chmod +x set-tether-ttl.sh && sh set-tether-ttl.sh`
-*** Termux:Boot will automatically run set-tether-ttl.sh after startup/boot, though it will break if the interface name changes, which I cannot test nor know if this happens on Android, and if it does it may be specific to a ROM.
-
 
 == 3. Check TTL & HL
 
@@ -312,19 +233,117 @@ Do this for both the tethering device, and the devices being tethered to.
 * IPv6/HL: `$ ping -6 bing.com`
 ** For Android & macOS: `$ ping6 bing.com`
 
+== 4. Using a VPN to bypass DPI-based throttling, traffic shaping, and censorship
 
-== 4. Confirm the tethering is unthrottled
+.Least shady free VPNs; not recommended.
+[%collapsible]
+====
 
-NOTE: If your telecom doesn't charge $$$ for going over the hotspot/tethering data limit, max out its cap before proceeding. +
-It'll make it easy to determine if this works, as after maxing the cap, some telecoms will use more tactics to ensure you're in line with how they want you to use their service.
+* Ordered from best to worst:
+. link:https://cloudflarewarp.com/[Cloudflare WARP] (never torrent on this). +
+You can get the link:https://github.com/TheCaduceus/WARP-UNLIMITED-ADVANCED[paid WARP+ for free], in which the "Railway App" method is recommended.
 
-* Disconnect from any VPNs.
-* Use link:https://fast.com[Netflix's Speedtest], then after that's complete use link:https://www.waveform.com/tools/bufferbloat[Waveform's Bufferbloat Test]. This will test for throttling of streaming servers (Netflix), various forms of fingerprinting, and tethering/hotspot detections.
-* Connect to a VPN, then repeat the above step.
-** If the speeds are lower than expected on all VPN protocols, connect to the VPN on a device that hardware accelerates the cryptography used, such as link:https://web.archive.org/web/20220314000051/https://wikiless.org/wiki/AES_instruction_set?lang=en[AES-NI] for x86_64 processors.
+. link:https://cryptostorm.is/cryptofree[Cryptofree]
+** Using their free WireGuard server is recommended.
 
-NOTE: If the VPN can't connect, first check if IPv4 or IPv6 is being used to reach the VPN server; on T-Mobile, connecting through IPv6 may be required. +
-If the VPN still can't connect, change its protocol used in this order: +
-WireGuard -> IKEv2/IPSec -> SoftEther -> OpenVPN (UDP, port 443) -> OpenVPN (TCP, port 443) -> OpenVPN over SSL (TCP, port 443)
+. https://protonvpn.com/free-vpn/[ProtonVPN Free]
 
-TIP: + If this guide worked, then Star this repository!
+====
+
+.Open-source VPN protocol comparison; what is suitable for your situation.
+[%collapsible]
+====
+* *WireGuard*, the fastest on reliable internet; easily detected by DPI firewalls.
+* *IKEv2/IPSec*, sometimes faster than WireGuard on unreliable internet. Depending on the VPN provider, IKEv2 can either be resistant to DPI firewalls (hide.me's implementation), or not at all.
+* *SoftEther*, bypasses DPI firewalls easily with good speeds in general, but is more complicated to set up for non-Windows OSes.
+* *OpenVPN3*, resistant to DPI firewalls if tls-crypt is used alongside port 443; China, Iran, and Egypt require OpenVPN over SSL which further reduces speeds. This protocol isn't efficient and has bufferbloat issues.
+
+====
+
+.How to find good paid VPN providers.
+[%collapsible]
+====
+
+.*Good paid VPN providers have or do the following:*
+. Show which servers are geolocated/virtual (fake location) servers, or have none.
+
+. Addon available (or included) for a dedicated/static/streaming IP, to get around streaming service blocks, and other websites using anti-VPN services such as https://blocked.com.
+
+. P2P/link:http://www.bittorrent.org/introduction.html[BitTorrent protocol] isn't blocked on all servers.
+** If all servers have this protocol unblocked, it will narrow down the amount of hosting services that VPN provider can use. +
+This means higher ping/latency for some ISPs/telecoms; low latency is important for online gaming and video conferencing, among others.
+
+. SOCKS5 and HTTPS/SSL proxies provided.
+** Some VPNs such as TorGuard use this to allow torrenting in countries where it's forbidden; a SOCKS5 proxy can allow torrenting by being located in Canada while you're connected to no VPN server, or a VPN server located in the United States.
+
+. Ability to port forward at least 5 ports while supporting IPv6; this gauges a VPN provider's attention to detail, even if you never need port forwarding.
+** link:https://web.archive.org/web/20220731172057/https://teddit.net/r/VPNTorrents/comments/s9f36q/list_of_vpns_that_allow_portforwarding_2022/[List of VPNs that support Port Forwarding].
+
+. If the OpenVPN protocol is supported, its tls-crypt must be supported and for the VPN provider to allow establishing connection to their servers via port 443.
+
+** OpenVPN over SSL or SSH is mandatory for China, Iran, and Egypt.
+. Full IPv4 and IPv6 support across all servers.
+** On some telecoms, connecting to a VPN server through IPv6 is required.
+
+. Reliable software across multiple operating systems.
+** The most problematic: Android TV, iOS/iPadOS, and Linux (especially distros not based on Ubuntu or Fedora).
+*** Linux support for most VPNs lack a graphical interface, and lack features included in their Windows and/or macOS VPN software.
+
+====
+
+TorGuard is the gold standard for other VPNs to follow as of 23 January 2023.
+
+NOTE: It's still recommended to review other options for yourself,  link:https://torguard.net/network/[TorGuard's server locations] for instance might not be suitable for you.
+
+___
+* A lot of VPN review websites and videos are dishonest, since Kape Technologies owns many of the most popular VPN review websites to unfairly promote their products as the "best": +
+https://restoreprivacy.com/kape-technologies-owns-expressvpn-cyberghost-pia-zenmate-vpn-review-sites/
+
+.Places with honest VPN reviews or information.
+[%collapsible]
+====
+
+. link:https://youtube.com/channel/UCXJWKuGh0qedrYviGEJmlWw[Tom Spark's Reviews] on YouTube, or directly at his link:https://www.vpntierlist.com/[VPN Tier List] website.
+
+. link:https://restoreprivacy.com/vpn/best/[RestorePrivacy].
+
+. link:https://web.archive.org/web/20220929090559/https://thatoneprivacysite.xyz/choosing-the-best-vpn-for-you/[An archive of "That One Privacy Site"], dated 19th December 2019. +
+Use it as a second opinion for what justifies a good paid VPN provider.
+
+====
+
+
+== 5. Confirm the tethering is un-throttled
+
+NOTE: Enable "Data Saver" while USB tethering. This tells Android to restrict data to USB tethering and what app is at the forefront only. +
+
+
+WARNING: If Wi-Fi or Bluetooth tethering is used, Android will forcefully disable "Data Saver".
+
+. Disconnect from the VPN.
+. Use link:https://fast.com[Netflix's Speedtest], then after that's complete use link:https://www.waveform.com/tools/bufferbloat[Waveform's Bufferbloat Test]. +
+This will test for throttling of streaming servers (Netflix), various forms of data fingerprinting, and tethering/hotspot detections.
+. Connect to a VPN on the tethered-to device, then repeat the above step.
+
+TIP: link:https://apkpure.com/root-ktweak-%E2%80%94-universal-kern/com.draco.ktweak[KTweak] can potentially increase speeds by using its "throughput" profile.
+
+==== If the VPN can't connect:
+. First check if IPv4 or IPv6 is being used to reach the VPN server.
+** For T-Mobile, connecting through IPv6 may be required.
+. If the VPN still can't connect, try each supported protocol in this order:
+** WireGuard -> IKEv2/IPSec -> SoftEther -> AnyConnect [TorGuard only] -> OpenVPN (UDP, port 443) -> OpenVPN (TCP, port 443) -> OpenVPN over SSL (TCP, port 443)
+
+___
+
+*You've reached the end of this guide.* Star it if you liked it.
+
+== Appendices
+.Learning resources used
+[%collapsible]
+====
+
+. https://archive.org/download/p173_20220313/p173.pdf
+. https://archive.org/download/technology-showcase-policy-control-for-connected-and-tethered-devices/technology-showcase-policy-control-for-connected-and-tethered-devices.pdf
+. https://archive.org/download/geneva_ccs19/geneva_ccs19.pdf
+
+====

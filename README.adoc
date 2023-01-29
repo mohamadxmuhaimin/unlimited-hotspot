@@ -43,29 +43,29 @@ endif::[]
 * link:https://apkpure.com/network-signal-guru/com.qtrun.QuickTest[Network Signal Guru for band locking], which can help maintain reliable speeds, and/or avoid congested bands for higher speeds.
 ** Enable "Systemless Hosts" in Magisk's settings, then install link:https://github.com/AdAway/AdAway/releases[AdAway]; use its root method before running Network Signal Guru to successfully block their advertising permanently (while AdAway is installed).
 
-___
-. Kernel in use must have the "xt_HL.ko" module built-in (netfilter's TTL/HL packet mangling); to test, run Termux:
+=== A custom kernel with "xt_HL.ko" support
+.Testing if "xt_HL.ko" (netfilter's TTL/HL packet mangling) is present:
+. Run Termux.
 . `$ su`
 . `# iptables -t mangle -A POSTROUTING -o null -j TTL --ttl-inc 1; ip6tables -t mangle -A POSTROUTING -o null -j HL --hl-inc 1`
 ** If there's no output, the kernel successfully has "xt_HL.ko" support.
 
-=== Installing a suitable custom kernel:
-* We're looking for:
-. Kernels with the BBR or BBRv2 TCP congestion control algorithm to link:https://web.archive.org/web/20220313173158/http://web.archive.org/screenshot/https://docs.google.com/spreadsheets/d/1I1NcVVbuC7aq4nGalYxMNz9pgS9OLKcFHssIBlj9xXI[help maintain speeds over bad network conditions].
-. "xt_HL.ko" support.
+=== Downloading a suitable custom kernel
+
+NOTE: The listed kernels include the BBR or BBRv2 TCP congestion control algorithm to link:https://web.archive.org/web/20220313173158/http://web.archive.org/screenshot/https://docs.google.com/spreadsheets/d/1I1NcVVbuC7aq4nGalYxMNz9pgS9OLKcFHssIBlj9xXI[help maintain speeds over bad network conditions].
 
 |===
-| Known good custom kernels:
-| 1. momojuro's link:https://forum.xda-developers.com/search/member?user_id=5670369&content=thread[fsociety tribute] kernel; recommended for the Pixel 4A (5G) and Pixel 5.
-| 2. Freak07's link:https://forum.xda-developers.com/search/member?user_id=3428502&content=thread[Kirisakura] kernel; recommended for the Pixel 6.
-| 3. kdrag0n's link:https://forum.xda-developers.com/search/member?user_id=7291478&content=thread[Proton Kernel].
+| 1. momojuro's link:https://forum.xda-developers.com/search/member?user_id=5670369&content=thread[fsociety tribute]; recommended for the Pixel 4A (5G) and Pixel 5.
+| 2. Freak07's link:https://forum.xda-developers.com/search/member?user_id=3428502&content=thread[Kirisakura]; recommended for the Pixel 6.
+| 3. kdrag0n's link:https://forum.xda-developers.com/search/member?user_id=7291478&content=thread[Proton].
 |===
 
-TIP: Search terms to use on link:https://forum.xda-developers.com/search/[XDA Forums] to find other kernels with "xt_HL.ko" support: +
+TIP: Not for your device? +
+Use these search terms on the link:https://forum.xda-developers.com/search/[XDA Forums] to find other kernels with "xt_HL.ko" support: +
 `TTL spoofing`, `TTL target`, `IPtables TTL`, `TTL/HL target`, `TTL module`.
 
 
-* Installing a custom kernel:
+=== Installing a custom kernel
 . Install link:https://f-droid.org/en/packages/com.smartpack.busyboxinstaller/[BusyBox].
 . Install link:https://apkmody.io/apps/franco-kernel-manager-apk/download[Franco Kernel Manager].
 . Run Franco Kernel Manager and go to "Flasher", from there the kernel can be flashed/installed.
@@ -233,6 +233,7 @@ Do this for both the tethering device, and the devices being tethered to.
 * IPv6/HL: `$ ping -6 bing.com`
 ** For Android & macOS: `$ ping6 bing.com`
 
+
 == 4. Using a VPN to bypass DPI-based throttling, traffic shaping, and censorship
 
 .Least shady free VPNs; not recommended.
@@ -260,11 +261,11 @@ You can get the link:https://github.com/TheCaduceus/WARP-UNLIMITED-ADVANCED[paid
 
 ====
 
-.How to find good paid VPN providers.
+
+.Requirements for a good paid VPN provider.
 [%collapsible]
 ====
 
-.*Good paid VPN providers have or do the following:*
 . Show which servers are geolocated/virtual (fake location) servers, or have none.
 
 . Addon available (or included) for a dedicated/static/streaming IP, to get around streaming service blocks, and other websites using anti-VPN services such as https://blocked.com.
@@ -274,7 +275,7 @@ You can get the link:https://github.com/TheCaduceus/WARP-UNLIMITED-ADVANCED[paid
 This means higher ping/latency for some ISPs/telecoms; low latency is important for online gaming and video conferencing, among others.
 
 . SOCKS5 and HTTPS/SSL proxies provided.
-** Some VPNs such as TorGuard use this to allow torrenting in countries where it's forbidden; a SOCKS5 proxy can allow torrenting by being located in Canada while you're connected to no VPN server, or a VPN server located in the United States.
+** Some VPNs such as TorGuard use this to allow BitTorrent in countries where it's forbidden; a SOCKS5 proxy can allow BitTorrent by being located in Canada while you're connected to no VPN server, or a VPN server located in the United States.
 
 . Ability to port forward at least 5 ports while supporting IPv6; this gauges a VPN provider's attention to detail, even if you never need port forwarding.
 ** link:https://web.archive.org/web/20220731172057/https://teddit.net/r/VPNTorrents/comments/s9f36q/list_of_vpns_that_allow_portforwarding_2022/[List of VPNs that support Port Forwarding].
@@ -291,15 +292,8 @@ This means higher ping/latency for some ISPs/telecoms; low latency is important 
 
 ====
 
-TorGuard is the gold standard for other VPNs to follow as of 23 January 2023.
 
-NOTE: It's still recommended to review other options for yourself,  link:https://torguard.net/network/[TorGuard's server locations] for instance might not be suitable for you.
-
-___
-* A lot of VPN review websites and videos are dishonest, since Kape Technologies owns many of the most popular VPN review websites to unfairly promote their products as the "best": +
-https://restoreprivacy.com/kape-technologies-owns-expressvpn-cyberghost-pia-zenmate-vpn-review-sites/
-
-.Places with honest VPN reviews or information.
+.Finding honest VPN reviews or information.
 [%collapsible]
 ====
 
@@ -310,13 +304,19 @@ https://restoreprivacy.com/kape-technologies-owns-expressvpn-cyberghost-pia-zenm
 . link:https://web.archive.org/web/20220929090559/https://thatoneprivacysite.xyz/choosing-the-best-vpn-for-you/[An archive of "That One Privacy Site"], dated 19th December 2019. +
 Use it as a second opinion for what justifies a good paid VPN provider.
 
+TIP: Many VPN review websites and videos are dishonest, as Kape Technologies owns many popular VPN review websites to unfairly promote their products as the "best". +
+https://restoreprivacy.com/kape-technologies-owns-expressvpn-cyberghost-pia-zenmate-vpn-review-sites/
+
 ====
+
+TorGuard is the gold standard for other VPNs to follow as of 23 January 2023, except for their Windows or macOS program; hide.me does a better job at it.
+
+NOTE: It's still recommended to review other options for yourself,  link:https://torguard.net/network/[TorGuard's server locations] for instance might not be suitable for you.
 
 
 == 5. Confirm the tethering is un-throttled
 
-NOTE: Enable "Data Saver" while USB tethering. This tells Android to restrict data to USB tethering and what app is at the forefront only. +
-
+NOTE: Enable "Data Saver" while USB tethering. This tells Android to restrict data to USB tethering and what app is at the forefront only.
 
 WARNING: If Wi-Fi or Bluetooth tethering is used, Android will forcefully disable "Data Saver".
 
@@ -333,11 +333,9 @@ TIP: link:https://apkpure.com/root-ktweak-%E2%80%94-universal-kern/com.draco.ktw
 . If the VPN still can't connect, try each supported protocol in this order:
 ** WireGuard -> IKEv2/IPSec -> SoftEther -> AnyConnect [TorGuard only] -> OpenVPN (UDP, port 443) -> OpenVPN (TCP, port 443) -> OpenVPN over SSL (TCP, port 443)
 
-___
-
-*You've reached the end of this guide.* Star it if you liked it.
 
 == Appendices
+
 .Learning resources used
 [%collapsible]
 ====
@@ -347,3 +345,5 @@ ___
 . https://archive.org/download/geneva_ccs19/geneva_ccs19.pdf
 
 ====
+
+*You've reached the end of this guide.* Star it if you liked it.

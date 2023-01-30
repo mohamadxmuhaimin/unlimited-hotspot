@@ -8,6 +8,21 @@ ifdef::env-github[]
 :warning-caption: :warning:
 endif::[]
 
+== Goals/comparisons to other methods
+[%collapsible]
+====
+
+* Least amount of speed reduction with no increase in link:https://www.waveform.com/tools/bufferbloat[bufferbloat]; unlike the link:https://github.com/RiFi2k/unlimited-tethering[sshuttle method].
+
+* Difficult for telecoms to prove intentional bypassing of their DPI firewall and tethering detections; unlike the link:https://github.com/krlvm/PowerTunnel-Android[PowerTunnel method].
+
+* Fully bypassing DPI (Deep Packet Inspection); used to throttle & tamper with sites such as Netflix or YouTube (to force a low resolution like 480p), and sometimes censorship.
+** A good VPN is required for this goal.
+
+* Works for as many tethered to devices as possible.
+
+====
+
 == Requirements
 * A rooted Android device with an active SIM card.
 
@@ -16,19 +31,6 @@ endif::[]
 * Get an unlocked Google Pixel phone that support all radio bands of your telecom.
 ** Use link:https://www.kimovil.com/en/[Kimovil] to check radio band support. Note that the same phone from different countries have different bands supported.
 ** The recommendation is a link:https://swappa.com/buy/used/google-pixel-4a-5g/unlocked[Pixel 4a (5G)] for $100 USD off Swappa instead of Ebay due to their human review of listings, and requirements imposed on sellers to prevent scams or false advertising.
-
-
-== Introduction
-
-.Goals:
-* Least amount of speed reduction with no increase in link:https://www.waveform.com/tools/bufferbloat[bufferbloat]; unlike the link:https://github.com/RiFi2k/unlimited-tethering[sshuttle method].
-
-* Difficult for telecoms to prove intentional bypassing of their  DPI firewall and tethering detections; unlike the link:https://github.com/krlvm/PowerTunnel-Android[PowerTunnel method].
-
-* Fully bypassing DPI (Deep Packet Inspection); used to throttle & tamper with sites such as Netflix or YouTube (to force a low resolution like 480p), and sometimes censorship.
-** A good VPN is required for this goal.
-
-* Works for as many tethered to devices as possible.
 
 
 == Preparation
@@ -66,7 +68,7 @@ Use these search terms on the link:https://forum.xda-developers.com/search/[XDA 
 
 
 === Installing a custom kernel
-. Install link:https://f-droid.org/en/packages/com.smartpack.busyboxinstaller/[BusyBox].
+. Install link:https://f-droid.org/en/packages/com.smartpack.busyboxinstaller/[BusyBox], then run it to install BusyBox.
 . Install link:https://apkmody.io/apps/franco-kernel-manager-apk/download[Franco Kernel Manager].
 . Run Franco Kernel Manager and go to "Flasher", from there the kernel can be flashed/installed.
 
@@ -250,6 +252,7 @@ You can get the link:https://github.com/TheCaduceus/WARP-UNLIMITED-ADVANCED[paid
 . https://protonvpn.com/free-vpn/[ProtonVPN Free]
 
 ====
+
 
 .Open-source VPN protocol comparison; what is suitable for your situation.
 [%collapsible]

@@ -1,2 +1,5 @@
-# Auto detect text files and perform LF normalization
-* text=auto
+# These files must always have "LF" line endings on checkout.
+META-INF/** text eol=lf
+*.prop text eol=lf
+*.sh text eol=lf
+*.adoc text eol=lf

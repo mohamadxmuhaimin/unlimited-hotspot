@@ -8,119 +8,80 @@ ifdef::env-github[]
 :warning-caption: :warning:
 endif::[]
 
-== Goals/comparisons to other methods
-[%collapsible]
-====
+== About
+[.lead]
+This hotspot/tethering limitation bypass beats PDANet, FoxFi, NetShare, EasyTether, WiFi Tether Router, and sshuttle tunneling. Reasons being:
 
-* Least amount of speed reduction with no increase in link:https://www.waveform.com/tools/bufferbloat[bufferbloat]; unlike the link:https://github.com/RiFi2k/unlimited-tethering[sshuttle method].
+. Least amount or no speed reduction, is reliable, doesn't break apps/programs/software, and no increase in https://www.waveform.com/tools/bufferbloat[bufferbloat]/ping spikes.
 
-* Difficult for telecoms to prove intentional bypassing of their DPI firewall and tethering detections; unlike the link:https://github.com/krlvm/PowerTunnel-Android[PowerTunnel method].
+. Works for as many client (tethered to) devices as possible. It's plug and play after setup.
+** This means no programs are required to be installed on client devices.
 
-* Fully bypassing DPI (Deep Packet Inspection); used to throttle & tamper with sites such as Netflix or YouTube (to force a low resolution like 480p), and sometimes censorship.
-** A good VPN is required for this goal.
+. Difficult for telecoms to prove intentional bypassing of their tethering detections.
 
-* Works for as many tethered to devices as possible.
-
-====
+. Optionally can fully bypass DPI (Deep Packet Inspection); used to throttle & tamper with sites such as Netflix or YouTube by limiting video quality, and sometimes censorship.
+** A good VPN provider is required for this goal.
 
 == Requirements
-* A rooted Android device with an active SIM card.
+* A rooted Android 5.0 or newer device with an active SIM card or eSIM.
+** Android 4.4.4 is compatible if Magisk v20.4 or up to v22.0 is used.
 
 
 == Requirements can't be met
 * Get an unlocked Google Pixel phone that support all radio bands of your telecom.
-** Use link:https://www.kimovil.com/en/[Kimovil] to check radio band support. Note that the same phone from different countries have different bands supported.
-** The recommendation is a link:https://swappa.com/buy/used/google-pixel-4a-5g/unlocked[Pixel 4a (5G)] for $100 USD off Swappa instead of Ebay due to their human review of listings, and requirements imposed on sellers to prevent scams or false advertising.
+** Use https://www.kimovil.com/en/[Kimovil] to check radio band support. Note that the same phone from different countries have different bands supported.
+** The recommendation is an unlocked https://swappa.com/listings/google-pixel-4a-5g/unlocked[Pixel 4a (5G)] for $100 USD from https://swappa.com/vs/ebay[Swappa instead of Ebay].
 
 
 == Preparation
 
-. link:https://topjohnwu.github.io/Magisk/[Install Magisk], then the link:https://github.com/Magisk-Modules-Repo/MagiskHidePropsConf#installation[MagiskHide Props Config] module.
+. https://topjohnwu.github.io/Magisk/[Install Magisk]; read "Getting Started", then "Patching Images".
 
 . Install the following apps:
 
-* The link:https://f-droid.org/en/packages/com.termux/[Termux] terminal emulator (link:https://wiki.termux.com/wiki/Termux_Google_Play[from F-Droid only]), and link:https://f-droid.org/en/packages/com.termux.boot/[Termux:Boot].
-** Run Termux:Boot once before continuing.
+* The https://f-droid.org/en/packages/com.termux/[Termux] terminal emulator from F-Droid only (https://wiki.termux.com/wiki/Termux_Google_Play[why?]).
 
-* link:https://apkpure.com/network-signal-guru/com.qtrun.QuickTest[Network Signal Guru for band locking], which can help maintain reliable speeds, and/or avoid congested bands for higher speeds.
-** Enable "Systemless Hosts" in Magisk's settings, then install link:https://github.com/AdAway/AdAway/releases[AdAway]; use its root method before running Network Signal Guru to successfully block their advertising permanently (while AdAway is installed).
+* https://apkpure.com/network-signal-guru/com.qtrun.QuickTest[Network Signal Guru] for its band locking, helps maintain reliable speeds, and/or avoid congested bands for higher speeds.
+
+* https://github.com/AdAway/AdAway/releases[AdAway] to block Network Signal Guru's advertising.
+** AdAway requires you to enable "Systemless Hosts" in Magisk's settings.
 
 === A custom kernel with "xt_HL.ko" support
 .Testing if "xt_HL.ko" (netfilter's TTL/HL packet mangling) is present:
 . Run Termux.
 . `$ su`
 . `# iptables -t mangle -A POSTROUTING -o null -j TTL --ttl-inc 1; ip6tables -t mangle -A POSTROUTING -o null -j HL --hl-inc 1`
-** If there's no output, the kernel successfully has "xt_HL.ko" support.
+** If there's no output, skip downloading and installing a custom kernel as there's already "xt_HL.ko" support.
 
 === Downloading a suitable custom kernel
 
-NOTE: The listed kernels include the BBR or BBRv2 TCP congestion control algorithm to link:https://web.archive.org/web/20220313173158/http://web.archive.org/screenshot/https://docs.google.com/spreadsheets/d/1I1NcVVbuC7aq4nGalYxMNz9pgS9OLKcFHssIBlj9xXI[help maintain speeds over bad network conditions].
+NOTE: The listed kernels include the BBR or BBRv2 TCP congestion control algorithm to https://web.archive.org/web/20220313173158/http://web.archive.org/screenshot/https://docs.google.com/spreadsheets/d/1I1NcVVbuC7aq4nGalYxMNz9pgS9OLKcFHssIBlj9xXI[help maintain speeds over bad network conditions].
 
 |===
-| 1. momojuro's link:https://forum.xda-developers.com/search/member?user_id=5670369&content=thread[fsociety tribute]; recommended for the Pixel 4A (5G) and Pixel 5.
-| 2. Freak07's link:https://forum.xda-developers.com/search/member?user_id=3428502&content=thread[Kirisakura]; recommended for the Pixel 6.
-| 3. kdrag0n's link:https://forum.xda-developers.com/search/member?user_id=7291478&content=thread[Proton].
+| 1. momojuro's https://forum.xda-developers.com/search/member?user_id=5670369&content=thread[fsociety tribute]; recommended for the Pixel 4A (5G) and Pixel 5.
+| 2. Freak07's https://forum.xda-developers.com/search/member?user_id=3428502&content=thread[Kirisakura]; recommended for the Pixel 6.
+| 3. kdrag0n's https://forum.xda-developers.com/search/member?user_id=7291478&content=thread[Proton].
 |===
 
 TIP: Not for your device? +
-Use these search terms on the link:https://forum.xda-developers.com/search/[XDA Forums] to find other kernels with "xt_HL.ko" support: +
+Use these search terms on the https://forum.xda-developers.com/search/[XDA Forums] to find other kernels with "xt_HL.ko" support: +
 `TTL spoofing`, `TTL target`, `IPtables TTL`, `TTL/HL target`, `TTL module`.
 
 
 === Installing a custom kernel
-. Install link:https://f-droid.org/en/packages/com.smartpack.busyboxinstaller/[BusyBox], then run it to install BusyBox.
-. Install link:https://apkmody.io/apps/franco-kernel-manager-apk/download[Franco Kernel Manager].
-. Run Franco Kernel Manager and go to "Flasher", from there the kernel can be flashed/installed.
+. Install https://github.com/SmartPack/BusyBox-Installer/releases[BusyBox Installer], then run it.
+. Install https://github.com/libxzr/HorizonKernelFlasher/releases[Horizon Kernel Flasher], run it, then point it to the ZIP containing the custom kernel.
 
 
-== 1. Block Android's snitching
+== 1. Blocking Android snitching, and spoofing TTL & HL
 
-. Run Termux.
-. `$ su`
-. `# settings delete system tether_entitlement_check_state; settings delete global tether_dun_required`
-. `# props`
-** "Select an option below." -> "Add/edit custom props" kbd:[5 ↵]
-** Select "New custom prop" with kbd:[n ↵]
-*** `net.tethering.noprovisioning` kbd:[↵] -> kbd:[true ↵] -> kbd:[y ↵]
-**** "Do you want to reboot now?" kbd:[n ↵]
-** Select "New custom prop" with kbd:[n ↵]
-*** `tether_entitlement_check_state` kbd:[↵]
-**** "Are you sure you want to proceed?" kbd:[y ↵] -> kbd:[0 ↵] -> kbd:[y ↵]
-**** "Do you want to reboot now?" kbd:[n ↵]
-** Select "New custom prop" with kbd:[n ↵]
-*** `tether_dun_required` kbd:[↵] -> kbd:[0 ↵] -> kbd:[y ↵]
-**** "Do you want to reboot now?" -> kbd:[y ↵]
+. Download our https://github.com/felikcat/unlimited-hotspot/archive/refs/heads/master.zip[Unlimited Hotspot] Magisk module.
+. Open Magisk -> Modules -> Install from storage -> Select the "master.zip" that was downloaded.
+. Reboot.
 
+[.lead] 
+For routers to also be plug and play, additional steps are required:
 
-== 2. Spoof TTL & HL
-
-. Show the currently used network interfaces; it's helpful for troubleshooting if needed.
-** `$ netstat -i`
-** Open Termux:Boot at least once, this allows it to run at boot while installed.
-
-. Make the script:
-** `$ mkdir -p ~/.termux/boot`
-** `$ cd ~/.termux/boot`
-** `$ nano set-tether-ttl.sh`
-
-[source, shell]
-----
-#!/bin/sh
-su -c "iptables -t mangle -D PREROUTING -i v4-rmnet_data+ -j TTL --ttl-inc 1 && \
-iptables -t mangle -D POSTROUTING -o v4-rmnet_data+ -j TTL --ttl-inc 1 && \
-ip6tables -t mangle -D PREROUTING ! -p icmpv6 -i v4-rmnet_data+ -j HL --hl-inc 1 && \
-ip6tables -t mangle -D POSTROUTING ! -p icmpv6 -o v4-rmnet_data+ -j HL --hl-inc 1
-iptables -t mangle -I PREROUTING -i v4-rmnet_data+ -j TTL --ttl-inc 1 && \
-iptables -t mangle -I POSTROUTING -o v4-rmnet_data+ -j TTL --ttl-inc 1 && \
-ip6tables -t mangle -I PREROUTING ! -p icmpv6 -i v4-rmnet_data+ -j HL --hl-inc 1 && \
-ip6tables -t mangle -I POSTROUTING ! -p icmpv6 -o v4-rmnet_data+ -j HL --hl-inc 1"
-----
-
-* Run the script:
-** `$ chmod +x set-tether-ttl.sh && sh set-tether-ttl.sh`
-
-
-=== For routers, additional steps are required.
 .Asuswrt-Merlin
 [%collapsible]
 ====
@@ -135,8 +96,8 @@ ip6tables -t mangle -I POSTROUTING ! -p icmpv6 -o v4-rmnet_data+ -j HL --hl-inc 
 [source, shell]
 ----
 #!/bin/sh
-# Martineau wrote this script
-# See https://www.snbforums.com/threads/wan-start-script-also-run-on-wan-stop.61295/#post-542636
+# Martineau wrote this script:
+# https://www.snbforums.com/threads/wan-start-script-also-run-on-wan-stop.61295/#post-542636
 #
 #   v384.15 Introduced wan-event script, (wan-start will be deprecated in a future release.)
 #
@@ -197,7 +158,7 @@ ___
 ====
 
 
-.GoldenOrb & OpenWrt via LuCI
+.GoldenOrb or OpenWrt via LuCI
 [%collapsible]
 ====
 . GoldenOrb specific: `Network` -> `Firewall` -> `Custom TTL Settings`
@@ -223,7 +184,7 @@ ___
 ====
 
 
-== 3. Check TTL & HL
+== 2. Check TTL & HL
 
 Do this for both the tethering device, and the devices being tethered to.
 
@@ -236,17 +197,17 @@ Do this for both the tethering device, and the devices being tethered to.
 ** For Android & macOS: `$ ping6 bing.com`
 
 
-== 4. Using a VPN to bypass DPI-based throttling, traffic shaping, and censorship
+== 3. Using a VPN to bypass DPI-based throttling, shaping, and censorship
 
 .Least shady free VPNs; not recommended.
 [%collapsible]
 ====
 
 * Ordered from best to worst:
-. link:https://cloudflarewarp.com/[Cloudflare WARP] (never torrent on this). +
-You can get the link:https://github.com/TheCaduceus/WARP-UNLIMITED-ADVANCED[paid WARP+ for free], in which the "Railway App" method is recommended.
+. https://cloudflarewarp.com/[Cloudflare WARP] (never torrent on this). +
+You can get the https://github.com/TheCaduceus/WARP-UNLIMITED-ADVANCED[paid WARP+ for free], in which the "Railway App" method is recommended.
 
-. link:https://cryptostorm.is/cryptofree[Cryptofree]
+. https://cryptostorm.is/cryptofree[Cryptofree]
 ** Using their free WireGuard server is recommended.
 
 . https://protonvpn.com/free-vpn/[ProtonVPN Free]
@@ -269,11 +230,13 @@ You can get the link:https://github.com/TheCaduceus/WARP-UNLIMITED-ADVANCED[paid
 [%collapsible]
 ====
 
+NOTE: TorGuard is the overall gold standard for other VPNs to follow as of 23 January 2023, except for their buggy Windows program. hide.me has the best Windows program at the moment.
+
 . Show which servers are geolocated/virtual (fake location) servers, or have none.
 
 . Addon available (or included) for a dedicated/static/streaming IP, to get around streaming service blocks, and other websites using anti-VPN services such as https://blocked.com.
 
-. P2P/link:http://www.bittorrent.org/introduction.html[BitTorrent protocol] isn't blocked on all servers.
+. P2P/http://www.bittorrent.org/introduction.html[BitTorrent protocol] isn't blocked on all servers.
 ** If all servers have this protocol unblocked, it will narrow down the amount of hosting services that VPN provider can use. +
 This means higher ping/latency for some ISPs/telecoms; low latency is important for online gaming and video conferencing, among others.
 
@@ -281,7 +244,7 @@ This means higher ping/latency for some ISPs/telecoms; low latency is important 
 ** Some VPNs such as TorGuard use this to allow BitTorrent in countries where it's forbidden; a SOCKS5 proxy can allow BitTorrent by being located in Canada while you're connected to no VPN server, or a VPN server located in the United States.
 
 . Ability to port forward at least 5 ports while supporting IPv6; this gauges a VPN provider's attention to detail, even if you never need port forwarding.
-** link:https://web.archive.org/web/20220731172057/https://teddit.net/r/VPNTorrents/comments/s9f36q/list_of_vpns_that_allow_portforwarding_2022/[List of VPNs that support Port Forwarding].
+** https://web.archive.org/web/20220731172057/https://teddit.net/r/VPNTorrents/comments/s9f36q/list_of_vpns_that_allow_portforwarding_2022/[List of VPNs that support Port Forwarding].
 
 . If the OpenVPN protocol is supported, its tls-crypt must be supported and for the VPN provider to allow establishing connection to their servers via port 443.
 
@@ -300,11 +263,11 @@ This means higher ping/latency for some ISPs/telecoms; low latency is important 
 [%collapsible]
 ====
 
-. link:https://youtube.com/channel/UCXJWKuGh0qedrYviGEJmlWw[Tom Spark's Reviews] on YouTube, or directly at his link:https://www.vpntierlist.com/[VPN Tier List] website.
+. https://youtube.com/channel/UCXJWKuGh0qedrYviGEJmlWw[Tom Spark's Reviews] on YouTube, or directly at his https://www.vpntierlist.com/[VPN Tier List] website.
 
-. link:https://restoreprivacy.com/vpn/best/[RestorePrivacy].
+. https://restoreprivacy.com/vpn/best/[RestorePrivacy].
 
-. link:https://web.archive.org/web/20220929090559/https://thatoneprivacysite.xyz/choosing-the-best-vpn-for-you/[An archive of "That One Privacy Site"], dated 19th December 2019. +
+. https://web.archive.org/web/20220929090559/https://thatoneprivacysite.xyz/choosing-the-best-vpn-for-you/[An archive of "That One Privacy Site"], dated 19th December 2019. +
 Use it as a second opinion for what justifies a good paid VPN provider.
 
 TIP: Many VPN review websites and videos are dishonest, as Kape Technologies owns many popular VPN review websites to unfairly promote their products as the "best". +
@@ -312,25 +275,21 @@ https://restoreprivacy.com/kape-technologies-owns-expressvpn-cyberghost-pia-zenm
 
 ====
 
-TorGuard is the gold standard for other VPNs to follow as of 23 January 2023, except for their Windows or macOS program; hide.me does a better job at it.
 
-NOTE: It's still recommended to review other options for yourself,  link:https://torguard.net/network/[TorGuard's server locations] for instance might not be suitable for you.
-
-
-== 5. Confirm the tethering is un-throttled
+== 4. Confirm the tethering is un-throttled
 
 NOTE: Enable "Data Saver" while USB tethering. This tells Android to restrict data to USB tethering and what app is at the forefront only.
 
 WARNING: If Wi-Fi or Bluetooth tethering is used, Android will forcefully disable "Data Saver".
 
 . Disconnect from the VPN.
-. Use link:https://fast.com[Netflix's Speedtest], then after that's complete use link:https://www.waveform.com/tools/bufferbloat[Waveform's Bufferbloat Test]. +
+. Use https://fast.com[Netflix's Speedtest], then after that's complete use https://www.waveform.com/tools/bufferbloat[Waveform's Bufferbloat Test]. +
 This will test for throttling of streaming servers (Netflix), various forms of data fingerprinting, and tethering/hotspot detections.
-. Connect to a VPN on the tethered-to device, then repeat the above step.
+. Connect to a VPN on the tethered-to (client) device, then repeat the above step.
 
-TIP: link:https://apkpure.com/root-ktweak-%E2%80%94-universal-kern/com.draco.ktweak[KTweak] can potentially increase speeds by using its "throughput" profile.
+. Optionally, speedtest again after installing https://github.com/tytydraco/KTweak-Android-App/releases[KTweak] and applying its "throughput" profile.
 
-==== If the VPN can't connect:
+=== If the VPN can't connect:
 . First check if IPv4 or IPv6 is being used to reach the VPN server.
 ** For T-Mobile, connecting through IPv6 may be required.
 . If the VPN still can't connect, try each supported protocol in this order:
@@ -346,6 +305,7 @@ TIP: link:https://apkpure.com/root-ktweak-%E2%80%94-universal-kern/com.draco.ktw
 . https://archive.org/download/p173_20220313/p173.pdf
 . https://archive.org/download/technology-showcase-policy-control-for-connected-and-tethered-devices/technology-showcase-policy-control-for-connected-and-tethered-devices.pdf
 . https://archive.org/download/geneva_ccs19/geneva_ccs19.pdf
+. Random XDA forums posts and threads to accumulate personal experiences with hotspot/tethering bypass attempts.
 
 ====
 

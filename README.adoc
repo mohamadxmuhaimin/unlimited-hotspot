@@ -75,8 +75,8 @@ Use these search terms on the https://forum.xda-developers.com/search/[XDA Forum
 
 == 1. Blocking Android snitching, and spoofing TTL & HL
 
-. Download our https://github.com/felikcat/unlimited-hotspot/archive/refs/heads/master.zip[Unlimited Hotspot] Magisk module.
-. Open Magisk -> Modules -> Install from storage -> Select the "master.zip" that was downloaded.
+. Download our https://github.com/felikcat/unlimited-hotspot/releases/download/v1/unlimited_hotspot_v1.zip[Unlimited Hotspot] Magisk module.
+. Open Magisk -> Modules -> Install from storage -> Select the "unlimited_hotspot_v1.zip" that was downloaded.
 . Reboot.
 
 [.lead] 

@@ -1,3 +1,0 @@
-# Deny alerting the telecom to check if tethering is allowed for this device.
-net.tethering.noprovisioning=true
-tether_entitlement_check_state=0

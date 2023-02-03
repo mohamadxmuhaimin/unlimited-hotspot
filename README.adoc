@@ -41,17 +41,18 @@ This hotspot/tethering limitation bypass beats PDANet, FoxFi, NetShare, EasyTeth
 
 * The https://f-droid.org/en/packages/com.termux/[Termux] terminal emulator from F-Droid only (https://wiki.termux.com/wiki/Termux_Google_Play[why?]).
 
-* https://apkpure.com/network-signal-guru/com.qtrun.QuickTest[Network Signal Guru] for its band locking, helps maintain reliable speeds, and/or avoid congested bands for higher speeds.
+* https://apkpure.com/network-signal-guru/com.qtrun.QuickTest[Network Signal Guru] for its radio band locking; helps maintain and potentially increase network speeds.
+** Tinkering is required to find your current location's best radio bands.
 
 * https://github.com/AdAway/AdAway/releases[AdAway] to block Network Signal Guru's advertising.
 ** AdAway requires you to enable "Systemless Hosts" in Magisk's settings.
 
 === A custom kernel with "xt_HL.ko" support
 .Testing if "xt_HL.ko" (netfilter's TTL/HL packet mangling) is present:
-. Run Termux.
+. Open Termux.
 . `$ su`
 . `# iptables -t mangle -A POSTROUTING -o null -j TTL --ttl-inc 1; ip6tables -t mangle -A POSTROUTING -o null -j HL --hl-inc 1`
-** If there's no output, skip downloading and installing a custom kernel as there's already "xt_HL.ko" support.
+** If there's no output, skip ahead to "1. Blocking Android snitching...", as your kernel already has "xt_HL.ko" support.
 
 === Downloading a suitable custom kernel
 
@@ -69,14 +70,14 @@ Use these search terms on the https://forum.xda-developers.com/search/[XDA Forum
 
 
 === Installing a custom kernel
-. Install https://github.com/SmartPack/BusyBox-Installer/releases[BusyBox Installer], then run it.
-. Install https://github.com/libxzr/HorizonKernelFlasher/releases[Horizon Kernel Flasher], run it, then point it to the ZIP containing the custom kernel.
+. Install https://github.com/SmartPack/BusyBox-Installer/releases[BusyBox Installer], then open it.
+. Install https://github.com/libxzr/HorizonKernelFlasher/releases[Horizon Kernel Flasher], open it, then point it to the ZIP containing the custom kernel.
 
 
 == 1. Blocking Android snitching, and spoofing TTL & HL
 
-. Download our https://github.com/felikcat/unlimited-hotspot/releases/download/v1/unlimited_hotspot_v1.zip[Unlimited Hotspot] Magisk module.
-. Open Magisk -> Modules -> Install from storage -> Select the "unlimited_hotspot_v1.zip" that was downloaded.
+. Download our https://github.com/felikcat/unlimited-hotspot/releases/download/v3/unlimited-hotspot-v3.zip[Unlimited Hotspot] Magisk module.
+. Open Magisk -> Modules -> Install from storage -> Select the "unlimited-hotspot-v3.zip" that was downloaded.
 . Reboot.
 
 [.lead] 
@@ -186,8 +187,6 @@ ___
 
 == 2. Check TTL & HL
 
-Do this for both the tethering device, and the devices being tethered to.
-
 * If the TTL and/or HL isn't exactly the same as the tethering device, then modify the `ttl-inc` and `hl-inc` to match.
 ** inc = increment, dec = decrement; `ttl-inc 2` adds to the TTL by 2, `ttl-dec 1` subtracts the TTL by 1.
 
@@ -218,10 +217,10 @@ You can get the https://github.com/TheCaduceus/WARP-UNLIMITED-ADVANCED[paid WARP
 .Open-source VPN protocol comparison; what is suitable for your situation.
 [%collapsible]
 ====
-* *WireGuard*, the fastest on reliable internet; easily detected by DPI firewalls.
+* *WireGuard*, the fastest on reliable internet; easily blockable by DPI firewalls.
 * *IKEv2/IPSec*, sometimes faster than WireGuard on unreliable internet. Depending on the VPN provider, IKEv2 can either be resistant to DPI firewalls (hide.me's implementation), or not at all.
-* *SoftEther*, bypasses DPI firewalls easily with good speeds in general, but is more complicated to set up for non-Windows OSes.
-* *OpenVPN3*, resistant to DPI firewalls if tls-crypt is used alongside port 443; China, Iran, and Egypt require OpenVPN over SSL which further reduces speeds. This protocol isn't efficient and has bufferbloat issues.
+* *SoftEther*, bypasses most DPI firewalls with good speeds in general, but is more complicated to set up for non-Windows OSes.
+* *OpenVPN3*, resistant to DPI firewalls if tls-crypt is used alongside port 443; China, Iran, and Egypt require OpenVPN over SSL which further reduce speeds. This protocol isn't efficient and has bufferbloat issues.
 
 ====
 
@@ -230,7 +229,7 @@ You can get the https://github.com/TheCaduceus/WARP-UNLIMITED-ADVANCED[paid WARP
 [%collapsible]
 ====
 
-NOTE: TorGuard is the overall gold standard for other VPNs to follow as of 23 January 2023, except for their buggy Windows program. hide.me has the best Windows program at the moment.
+NOTE: TorGuard is the recommendation if streaming (Netflix, Hulu, Amazon Prime, etc) is necessary. Otherwise, try TorGuard -> hide.me -> Mullvad.
 
 . Show which servers are geolocated/virtual (fake location) servers, or have none.
 
@@ -259,7 +258,7 @@ This means higher ping/latency for some ISPs/telecoms; low latency is important 
 ====
 
 
-.Finding honest VPN reviews or information.
+.Honest VPN reviews or information.
 [%collapsible]
 ====
 
@@ -268,7 +267,7 @@ This means higher ping/latency for some ISPs/telecoms; low latency is important 
 . https://restoreprivacy.com/vpn/best/[RestorePrivacy].
 
 . https://web.archive.org/web/20220929090559/https://thatoneprivacysite.xyz/choosing-the-best-vpn-for-you/[An archive of "That One Privacy Site"], dated 19th December 2019. +
-Use it as a second opinion for what justifies a good paid VPN provider.
+Use it as a second opinion on what justifies a good paid VPN provider.
 
 TIP: Many VPN review websites and videos are dishonest, as Kape Technologies owns many popular VPN review websites to unfairly promote their products as the "best". +
 https://restoreprivacy.com/kape-technologies-owns-expressvpn-cyberghost-pia-zenmate-vpn-review-sites/

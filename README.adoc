@@ -19,8 +19,7 @@ This hotspot/tethering limitation bypass beats PDANet, FoxFi, NetShare, EasyTeth
 
 . Difficult for telecoms to prove intentional bypassing of their tethering detections.
 
-. Optionally can fully bypass DPI (Deep Packet Inspection); used to throttle & tamper with sites such as Netflix or YouTube by limiting video quality, and sometimes censorship.
-** A good VPN provider is required for this goal.
+. Bypassing DPI (Deep Packet Inspection); used to throttle & tamper with streaming services by limiting video quality, and sometimes enacting censorship.
 
 == Requirements
 * A rooted Android 5.0 or newer device with an active SIM card or eSIM.
@@ -231,6 +230,8 @@ You can get the https://github.com/TheCaduceus/WARP-UNLIMITED-ADVANCED[paid WARP
 
 NOTE: TorGuard is the recommendation if streaming (Netflix, Hulu, Amazon Prime, etc) is necessary. Otherwise, try TorGuard -> hide.me -> Mullvad.
 
+. Network locking in their VPN software is reliable; very important to stay under the telecom's radar regarding "OS fingerprinting".
+
 . Show which servers are geolocated/virtual (fake location) servers, or have none.
 
 . Addon available (or included) for a dedicated/static/streaming IP, to get around streaming service blocks, and other websites using anti-VPN services such as https://blocked.com.
@@ -277,9 +278,7 @@ https://restoreprivacy.com/kape-technologies-owns-expressvpn-cyberghost-pia-zenm
 
 == 4. Confirm the tethering is un-throttled
 
-NOTE: Enable "Data Saver" while USB tethering. This tells Android to restrict data to USB tethering and what app is at the forefront only.
-
-WARNING: If Wi-Fi or Bluetooth tethering is used, Android will forcefully disable "Data Saver".
+TIP: After enabling USB tethering, enable "Data Saver". This tells Android to restrict data to USB tethering and what app is at the forefront only.
 
 . Disconnect from the VPN.
 . Use https://fast.com[Netflix's Speedtest], then after that's complete use https://www.waveform.com/tools/bufferbloat[Waveform's Bufferbloat Test]. +

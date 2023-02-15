@@ -10,26 +10,17 @@ endif::[]
 
 == About
 [.lead]
-This hotspot/tethering limitation bypass beats PDANet, FoxFi, NetShare, EasyTether, WiFi Tether Router, and sshuttle tunneling. Reasons being:
+This method compared to PDANet, FoxFi, NetShare, EasyTether, Wi-Fi Tether Router, and sshuttle tunneling:
 
-. Least amount or no speed reduction, is reliable, doesn't break apps/programs/software, and no increase in https://www.waveform.com/tools/bufferbloat[bufferbloat]/ping spikes.
+. Reliable with little to no speed reduction.
 
-. Works for as many client (tethered to) devices as possible. It's plug and play after setup.
-** This means no programs are required to be installed on client devices.
+. Plug and play, works with other devices without installing apps.
 
-. Difficult for telecoms to prove intentional bypassing of their tethering detections.
+. Safe from your telecom, but make sure to lie well if questioned for excessive data usage.
 
-. Bypassing DPI (Deep Packet Inspection); used to throttle & tamper with streaming services by limiting video quality, and sometimes enacting censorship.
+. Bypasses throttling such as limited video quality on YouTube, and censorship.
 
-== Requirements
-* A rooted Android 5.0 or newer device with an active SIM card or eSIM.
-** Android 4.4.4 is compatible if Magisk v20.4 or up to v22.0 is used.
-
-
-== Requirements can't be met
-* Get an unlocked Google Pixel phone that support all radio bands of your telecom.
-** Use https://www.kimovil.com/en/[Kimovil] to check radio band support. Note that the same phone from different countries have different bands supported.
-** The recommendation is an unlocked https://swappa.com/listings/google-pixel-4a-5g/unlocked[Pixel 4a (5G)] for $100 USD from https://swappa.com/vs/ebay[Swappa instead of Ebay].
+This guide is tested from an unlocked US https://swappa.com/listings/google-pixel-4a-5g/unlocked[Pixel 4a 5G], it can be had for $100.
 
 
 == Preparation
@@ -40,18 +31,17 @@ This hotspot/tethering limitation bypass beats PDANet, FoxFi, NetShare, EasyTeth
 
 * The https://f-droid.org/en/packages/com.termux/[Termux] terminal emulator from F-Droid only (https://wiki.termux.com/wiki/Termux_Google_Play[why?]).
 
-* https://apkpure.com/network-signal-guru/com.qtrun.QuickTest[Network Signal Guru] for its radio band locking; helps maintain and potentially increase network speeds.
+* https://apkpure.com/network-signal-guru/com.qtrun.QuickTest[Network Signal Guru] for its radio band locking to maintain and increase network speeds.
 ** Tinkering is required to find your current location's best radio bands.
 
 * https://github.com/AdAway/AdAway/releases[AdAway] to block Network Signal Guru's advertising.
 ** AdAway requires you to enable "Systemless Hosts" in Magisk's settings.
 
-=== A custom kernel with "xt_HL.ko" support
-.Testing if "xt_HL.ko" (netfilter's TTL/HL packet mangling) is present:
+=== Testing mangling support
 . Open Termux.
 . `$ su`
 . `# iptables -t mangle -A POSTROUTING -o null -j TTL --ttl-inc 1; ip6tables -t mangle -A POSTROUTING -o null -j HL --hl-inc 1`
-** If there's no output, skip ahead to "1. Blocking Android snitching...", as your kernel already has "xt_HL.ko" support.
+** No output = good, skip ahead to "1. Blocking Android snitching..."
 
 === Downloading a suitable custom kernel
 
@@ -96,13 +86,6 @@ For routers to also be plug and play, additional steps are required:
 [source, shell]
 ----
 #!/bin/sh
-# Martineau wrote this script:
-# https://www.snbforums.com/threads/wan-start-script-also-run-on-wan-stop.61295/#post-542636
-#
-#   v384.15 Introduced wan-event script, (wan-start will be deprecated in a future release.)
-#
-#          wan-event      {0 | 1} {stopping | stopped | disconnected | init | connecting | connected}
-#
 # shellcheck disable=SC2068
 Say() {
   printf '%s%s' "$$" "$@" | logger -st "($(basename "$0"))"
@@ -143,7 +126,7 @@ iptables -t mangle -D POSTROUTING -o usb+ -j TTL --ttl-inc 2
 ip6tables -t mangle -D PREROUTING ! -p icmpv6 -i usb+ -j HL --hl-inc 2
 ip6tables -t mangle -D POSTROUTING ! -p icmpv6 -o usb+ -j HL --hl-inc 2
 
-# Bypass TTL & HL detections for hotspot/tethering.
+# TTL & HL hotspot detection bypass.
 ## Increments the TTL & HL by 2 (1 for the router, 1 for the devices connected to the router).
 iptables -t mangle -I PREROUTING -i usb+ -j TTL --ttl-inc 2
 iptables -t mangle -I POSTROUTING -o usb+ -j TTL --ttl-inc 2
@@ -172,7 +155,7 @@ iptables -t mangle -D POSTROUTING -o usb+ -j TTL --ttl-inc 2
 ip6tables -t mangle -D PREROUTING ! -p icmpv6 -i usb+ -j HL --hl-inc 2
 ip6tables -t mangle -D POSTROUTING ! -p icmpv6 -o usb+ -j HL --hl-inc 2
 
-# Bypass TTL & HL detections for hotspot/tethering.
+# TTL & HL hotspot detection bypass.
 ## Increments the TTL & HL by 2 (1 for the router, 1 for the devices connected to the router).
 iptables -t mangle -I PREROUTING -i usb+ -j TTL --ttl-inc 2
 iptables -t mangle -I POSTROUTING -o usb+ -j TTL --ttl-inc 2
@@ -183,19 +166,7 @@ ip6tables -t mangle -I POSTROUTING ! -p icmpv6 -o usb+ -j HL --hl-inc 2
 ___
 ====
 
-
-== 2. Check TTL & HL
-
-* If the TTL and/or HL isn't exactly the same as the tethering device, then modify the `ttl-inc` and `hl-inc` to match.
-** inc = increment, dec = decrement; `ttl-inc 2` adds to the TTL by 2, `ttl-dec 1` subtracts the TTL by 1.
-
-* IPv4/TTL: `$ ping -4 bing.com`
-** For Android & macOS: `$ ping bing.com` 
-* IPv6/HL: `$ ping -6 bing.com`
-** For Android & macOS: `$ ping6 bing.com`
-
-
-== 3. Using a VPN to bypass DPI-based throttling, shaping, and censorship
+== 2. Using a VPN to bypass DPI-based throttling and censorship
 
 .Least shady free VPNs; not recommended.
 [%collapsible]
@@ -203,7 +174,7 @@ ___
 
 * Ordered from best to worst:
 . https://cloudflarewarp.com/[Cloudflare WARP] (never torrent on this). +
-You can get the https://github.com/TheCaduceus/WARP-UNLIMITED-ADVANCED[paid WARP+ for free], in which the "Railway App" method is recommended.
+You can get the https://github.com/TheCaduceus/WARP-UNLIMITED-ADVANCED[paid WARP+ for free].
 
 . https://cryptostorm.is/cryptofree[Cryptofree]
 ** Using their free WireGuard server is recommended.
@@ -216,10 +187,10 @@ You can get the https://github.com/TheCaduceus/WARP-UNLIMITED-ADVANCED[paid WARP
 .Open-source VPN protocol comparison; what is suitable for your situation.
 [%collapsible]
 ====
-* *WireGuard*, the fastest on reliable internet; easily blockable by DPI firewalls.
-* *IKEv2/IPSec*, sometimes faster than WireGuard on unreliable internet. Depending on the VPN provider, IKEv2 can either be resistant to DPI firewalls (hide.me's implementation), or not at all.
-* *SoftEther*, bypasses most DPI firewalls with good speeds in general, but is more complicated to set up for non-Windows OSes.
-* *OpenVPN3*, resistant to DPI firewalls if tls-crypt is used alongside port 443; China, Iran, and Egypt require OpenVPN over SSL which further reduce speeds. This protocol isn't efficient and has bufferbloat issues.
+* *WireGuard*: fastest on reliable internet; easily blockable by DPI firewalls.
+* *IKEv2/IPSec*: sometimes faster than WireGuard on unreliable internet. Depending on the VPN provider, IKEv2 can either be resistant to DPI firewalls (hide.me's implementation), or not at all.
+* *SoftEther*: bypasses most DPI firewalls with good speeds in general, but is more complicated to set up for non-Windows OSes.
+* *OpenVPN3*: resistant to DPI firewalls if tls-crypt is used alongside port 443; China, Iran, and Egypt require OpenVPN over SSL which further reduce speeds. This protocol isn't efficient and has latency issues.
 
 ====
 
@@ -228,7 +199,7 @@ You can get the https://github.com/TheCaduceus/WARP-UNLIMITED-ADVANCED[paid WARP
 [%collapsible]
 ====
 
-NOTE: TorGuard is the recommendation if streaming (Netflix, Hulu, Amazon Prime, etc) is necessary. Otherwise, try TorGuard -> hide.me -> Mullvad.
+NOTE: TorGuard is the recommendation if streaming (Netflix, Hulu, Amazon Prime, etc.) is necessary. Otherwise, try TorGuard -> hide.me -> Mullvad.
 
 . Network locking in their VPN software is reliable; very important to stay under the telecom's radar regarding "OS fingerprinting".
 
@@ -270,13 +241,13 @@ This means higher ping/latency for some ISPs/telecoms; low latency is important 
 . https://web.archive.org/web/20220929090559/https://thatoneprivacysite.xyz/choosing-the-best-vpn-for-you/[An archive of "That One Privacy Site"], dated 19th December 2019. +
 Use it as a second opinion on what justifies a good paid VPN provider.
 
-TIP: Many VPN review websites and videos are dishonest, as Kape Technologies owns many popular VPN review websites to unfairly promote their products as the "best". +
+TIP: Kape Technologies owns many popular VPN review websites to unfairly promote their products as the "best": +
 https://restoreprivacy.com/kape-technologies-owns-expressvpn-cyberghost-pia-zenmate-vpn-review-sites/
 
 ====
 
 
-== 4. Confirm the tethering is un-throttled
+== 3. Confirm the tethering is un-throttled
 
 TIP: After enabling USB tethering, enable "Data Saver". This tells Android to restrict data to USB tethering and what app is at the forefront only.
 
@@ -288,7 +259,7 @@ This will test for throttling of streaming servers (Netflix), various forms of d
 . Optionally, speedtest again after installing https://github.com/tytydraco/KTweak-Android-App/releases[KTweak] and applying its "throughput" profile.
 
 === If the VPN can't connect:
-. First check if IPv4 or IPv6 is being used to reach the VPN server.
+. Check if IPv4 or IPv6 is being used to reach the VPN server.
 ** For T-Mobile, connecting through IPv6 may be required.
 . If the VPN still can't connect, try each supported protocol in this order:
 ** WireGuard -> IKEv2/IPSec -> SoftEther -> AnyConnect [TorGuard only] -> OpenVPN (UDP, port 443) -> OpenVPN (TCP, port 443) -> OpenVPN over SSL (TCP, port 443)
@@ -296,14 +267,22 @@ This will test for throttling of streaming servers (Netflix), various forms of d
 
 == Appendices
 
-.Learning resources used
+.Resources used
 [%collapsible]
 ====
+
+[.lead]
+Learning
 
 . https://archive.org/download/p173_20220313/p173.pdf
 . https://archive.org/download/technology-showcase-policy-control-for-connected-and-tethered-devices/technology-showcase-policy-control-for-connected-and-tethered-devices.pdf
 . https://archive.org/download/geneva_ccs19/geneva_ccs19.pdf
 . Random XDA forums posts and threads to accumulate personal experiences with hotspot/tethering bypass attempts.
+
+[.lead]
+Third-party scripts
+
+. `/jffs/scripts/wan-event` used for Asuswrt-Merlin is a refined version of https://www.snbforums.com/threads/wan-start-script-also-run-on-wan-stop.61295/#post-542636[this script].
 
 ====
 

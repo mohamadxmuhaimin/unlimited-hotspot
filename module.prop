@@ -1,7 +1,7 @@
 id=unlimited-hotspot
 name=Unlimited Hotspot
-version=v3
-versionCode=3
+version=v4
+versionCode=4
 author=felikcat
 description=https://github.com/felikcat/unlimited-hotspot
 updateJson=https://raw.githubusercontent.com/felikcat/unlimited-hotspot/master/update.json

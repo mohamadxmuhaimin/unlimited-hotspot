@@ -10,40 +10,40 @@ endif::[]
 
 == About
 [.lead]
-This method compared to PDANet, FoxFi, NetShare, EasyTether, Wi-Fi Tether Router, and sshuttle tunneling:
+This bypass method & tutorial compared to PDANet, FoxFi, NetShare, EasyTether, Wi-Fi Tether Router, and sshuttle tunneling:
 
 . Reliable with little to no speed reduction.
 
-. Plug and play, works with other devices without installing apps.
+. Plug and play, other devices don't need to install apps to have internet.
 
-. Safe from your telecom, but make sure to lie well if questioned for excessive data usage.
-
-. Bypasses throttling such as limited video quality on YouTube, and censorship.
+. Bypasses service specific throttling such as limited video quality on YouTube or other streaming services, and censorship.
+** Other devices have to install an app for this goal, it's unavoidable.
 
 This guide is tested from an unlocked US https://swappa.com/listings/google-pixel-4a-5g/unlocked[Pixel 4a 5G], it can be had for $100.
 
 
 == Preparation
-
 . https://topjohnwu.github.io/Magisk/[Install Magisk]; read "Getting Started", then "Patching Images".
 
 . Install the following apps:
 
-* A https://f-droid.org/repo/jackpal.androidterm_72.apk[terminal emulator]; for that app make sure to allow all permissions it asked for.
+* A https://f-droid.org/repo/jackpal.androidterm_72.apk[terminal emulator]; for that app make sure to allow all the permissions it asked for.
 
 * https://apkpure.com/network-signal-guru/com.qtrun.QuickTest[Network Signal Guru] for its radio band locking to maintain and increase network speeds.
 
 * https://github.com/AdAway/AdAway/releases[AdAway] to block Network Signal Guru's advertising.
 ** AdAway requires you to enable "Systemless Hosts" in Magisk's settings.
 
+* https://apkpure.com/netmonster/cz.mroczis.netmonster[NetMonster] for its network monitoring. Without it, you are practically blind to what bands are used, and what the various signal strengths are; this is very useful information.
+
+
 === Testing mangling support
 . Open a terminal emulator.
 . `$ su`
 . `# iptables -t mangle -A POSTROUTING -o null -j TTL --ttl-inc 1; ip6tables -t mangle -A POSTROUTING -o null -j HL --hl-inc 1`
-** No output = good, skip ahead to "1. Blocking Android snitching..."
+** No output is good/desired. If this is the case, link:#skip-ahead[skip ahead] to blocking Android snitching, and spoofing TTL & HL.
 
 === Downloading a suitable custom kernel
-
 NOTE: The listed kernels include the BBR or BBRv2 TCP congestion control algorithm to https://web.archive.org/web/20220313173158/http://web.archive.org/screenshot/https://docs.google.com/spreadsheets/d/1I1NcVVbuC7aq4nGalYxMNz9pgS9OLKcFHssIBlj9xXI[help maintain speeds over bad network conditions].
 
 |===
@@ -58,15 +58,15 @@ Use these search terms on the https://forum.xda-developers.com/search/[XDA Forum
 
 
 === Installing a custom kernel
-. Install https://github.com/SmartPack/BusyBox-Installer/releases[BusyBox Installer], then open it.
+. Install https://github.com/SmartPack/BusyBox-Installer/releases[BusyBox Installer], open it, then reboot after it prompts to.
 . Install https://github.com/libxzr/HorizonKernelFlasher/releases[Horizon Kernel Flasher], open it, then point it to the ZIP containing the custom kernel.
 
 
-== 1. Blocking Android snitching, and spoofing TTL & HL
-
-. Download our https://github.com/felikcat/unlimited-hotspot/releases/download/v3/unlimited-hotspot-v3.zip[Unlimited Hotspot] Magisk module.
-. Open Magisk -> Modules -> Install from storage -> Select the "unlimited-hotspot-v3.zip" that was downloaded.
+== [[skip-ahead]]1. Blocking Android snitching, and spoofing TTL & HL
+. Download our https://github.com/felikcat/unlimited-hotspot/releases/download/v4/unlimited-hotspot-v4.zip[Unlimited Hotspot] Magisk module.
+. Open Magisk -> Modules -> Install from storage -> Select the "unlimited-hotspot-v4.zip" that was downloaded.
 . Reboot.
+
 
 [.lead] 
 For routers to also be plug and play, additional steps are required:
@@ -89,7 +89,6 @@ For routers to also be plug and play, additional steps are required:
 Say() {
   printf '%s%s' "$$" "$@" | logger -st "($(basename "$0"))"
 }
-#========================================================================================================================================
 WAN_IF=$1
 WAN_STATE=$2
 
@@ -115,9 +114,7 @@ fi
 #!/bin/sh
 
 # HACK: Not sure what to check for exactly; do it too early and the TTL & HL won't get set.
-sleep 5s
-
-modprobe xt_HL; wait
+sleep 5s; modprobe xt_HL; wait
 
 # Removes these iptables entries if present; only removes once, so if the same entry is present twice (script assumes this never happens), it would need to be removed twice.
 iptables -t mangle -D PREROUTING -i usb+ -j TTL --ttl-inc 2
@@ -127,9 +124,9 @@ ip6tables -t mangle -D POSTROUTING ! -p icmpv6 -o usb+ -j HL --hl-inc 2
 
 # TTL & HL hotspot detection bypass.
 ## Increments the TTL & HL by 2 (1 for the router, 1 for the devices connected to the router).
-iptables -t mangle -I PREROUTING -i usb+ -j TTL --ttl-inc 2
+iptables -t mangle -A PREROUTING -i usb+ -j TTL --ttl-inc 2
 iptables -t mangle -I POSTROUTING -o usb+ -j TTL --ttl-inc 2
-ip6tables -t mangle -I PREROUTING ! -p icmpv6 -i usb+ -j HL --hl-inc 2
+ip6tables -t mangle -A PREROUTING ! -p icmpv6 -i usb+ -j HL --hl-inc 2
 ip6tables -t mangle -I POSTROUTING ! -p icmpv6 -o usb+ -j HL --hl-inc 2
 ----
 Have to set permissions correctly to avoid this: `custom_script: Found wan-event, but script is not set executable!` +
@@ -156,49 +153,66 @@ ip6tables -t mangle -D POSTROUTING ! -p icmpv6 -o usb+ -j HL --hl-inc 2
 
 # TTL & HL hotspot detection bypass.
 ## Increments the TTL & HL by 2 (1 for the router, 1 for the devices connected to the router).
-iptables -t mangle -I PREROUTING -i usb+ -j TTL --ttl-inc 2
+iptables -t mangle -A PREROUTING -i usb+ -j TTL --ttl-inc 2
 iptables -t mangle -I POSTROUTING -o usb+ -j TTL --ttl-inc 2
-ip6tables -t mangle -I PREROUTING ! -p icmpv6 -i usb+ -j HL --hl-inc 2
+ip6tables -t mangle -A PREROUTING ! -p icmpv6 -i usb+ -j HL --hl-inc 2
 ip6tables -t mangle -I POSTROUTING ! -p icmpv6 -o usb+ -j HL --hl-inc 2
 ----
 
 ___
 ====
 
-== 2. Using a VPN to bypass DPI-based throttling and censorship
 
-.Least shady free VPNs; not recommended.
+== 2. Confirm the tethering is un-throttled
+TIP: After enabling USB tethering, enable "Data Saver". This tells Android to restrict data to USB tethering and what app is at the forefront only.
+
+. Use https://fast.com[Netflix's Speedtest], then compare that result to https://www.waveform.com/tools/bufferbloat[Waveform's Bufferbloat Test]. +
+This tests for throttling of streaming servers (Netflix), various forms of data fingerprinting, and tethering/hotspot detections.
+. If Netflix is throttled, use the https://github.com/krlvm/PowerTunnel[PowerTunnel] app on the client/tethered to device with its LibertyTunnel addon enabled, and test again.
+
+
+== 3. Getting better internet speeds
+. Search for "Roaming" in the Settings app, then disable Roaming.
+** Roaming to a different telecom usually means unavoidable throttling. Usually roaming only happens when signal strength is either very poor or non-existent from your telecom. +
+For example, T-Mobile USA's agreement with AT&T allow the usage of AT&T towers, but only up to 250kbps download & upload speeds is allowed while roaming on AT&T's network.
+. Use Network Signal Guru to set the allowed LTE bands to only the "LTE 4x4 Bands" listed on https://cacombos.com/device/G025E[cacombos.com] for your device.
+
+
+== This guide doesn't work, or goes from fast to inexplicably slow
+[.lead]
+Using a VPN is likely the missing puzzle piece. +
+VPNs bypass DPI firewalls, they will not increase privacy.
+
+
+.Least shady free VPNs; try before any paid VPNs.
 [%collapsible]
 ====
 
-* Ordered from best to worst:
-. https://cloudflarewarp.com/[Cloudflare WARP] (never torrent on this). +
-You can get the https://github.com/TheCaduceus/WARP-UNLIMITED-ADVANCED[paid WARP+ for free].
+. https://protonvpn.com/free-vpn/[ProtonVPN Free]
 
 . https://cryptostorm.is/cryptofree[Cryptofree]
 ** Using their free WireGuard server is recommended.
 
-. https://protonvpn.com/free-vpn/[ProtonVPN Free]
+. https://cloudflarewarp.com/[Cloudflare WARP] (never torrent on this). +
+You can get the https://github.com/TheCaduceus/WARP-UNLIMITED-ADVANCED[paid WARP+ for free].
 
+___
 ====
 
 
-.Open-source VPN protocol comparison; what is suitable for your situation.
-[%collapsible]
-====
-* *WireGuard*: fastest on reliable internet; easily blockable by DPI firewalls.
-* *IKEv2/IPSec*: sometimes faster than WireGuard on unreliable internet. Depending on the VPN provider, IKEv2 can either be resistant to DPI firewalls (hide.me's implementation), or not at all.
-* *SoftEther*: bypasses most DPI firewalls with good speeds in general, but is more complicated to set up for non-Windows OSes.
-* *OpenVPN3*: resistant to DPI firewalls if tls-crypt is used alongside port 443; China, Iran, and Egypt require OpenVPN over SSL which further reduce speeds. This protocol isn't efficient and has latency issues.
-
-====
-
-
-.Requirements for a good paid VPN provider.
+.Recommendations and requirements for a good paid VPN provider.
 [%collapsible]
 ====
 
-NOTE: TorGuard is the recommendation if streaming (Netflix, Hulu, Amazon Prime, etc.) is necessary. Otherwise, try TorGuard -> hide.me -> Mullvad.
+[.lead]
+The recommendations
+
+* United States citizens: https://www.privateinternetaccess.com/vpn-server[Private Internet Access]. Has a server in every single US state, and an optional dedicated IP addon if streaming services (Netflix, Hulu, Amazon Prime, etc.) must always work.
+* The fastest, but with a limited selection of servers for the United States: https://hide.me/en/network[hide.me].
+* Strong emphasis on ethics: https://mullvad.net/en/servers[Mullvad], https://www.cryptostorm.is/uptime[Cryptostorm], https://airvpn.org/status/[AirVPN].
+
+[.lead]
+The requirements
 
 . Network locking in their VPN software is reliable; very important to stay under the telecom's radar regarding "OS fingerprinting".
 
@@ -206,7 +220,7 @@ NOTE: TorGuard is the recommendation if streaming (Netflix, Hulu, Amazon Prime, 
 
 . Addon available (or included) for a dedicated/static/streaming IP, to get around streaming service blocks, and other websites using anti-VPN services such as https://blocked.com.
 
-. P2P/http://www.bittorrent.org/introduction.html[BitTorrent protocol] isn't blocked on all servers.
+. P2P/ http://www.bittorrent.org/introduction.html[BitTorrent protocol] isn't blocked on all servers.
 ** If all servers have this protocol unblocked, it will narrow down the amount of hosting services that VPN provider can use. +
 This means higher ping/latency for some ISPs/telecoms; low latency is important for online gaming and video conferencing, among others.
 
@@ -226,47 +240,32 @@ This means higher ping/latency for some ISPs/telecoms; low latency is important 
 ** The most problematic: Android TV, iOS/iPadOS, and Linux (especially distros not based on Ubuntu or Fedora).
 *** Linux support for most VPNs lack a graphical interface, and lack features included in their Windows and/or macOS VPN software.
 
+TIP: https://web.archive.org/web/20220929090559/https://thatoneprivacysite.xyz/choosing-the-best-vpn-for-you/[An archive of "That One Privacy Site"], dated 19th December 2019. +
+Use it as a second opinion on what justifies a good paid VPN provider.
+
+___
 ====
 
 
-.Honest VPN reviews or information.
+.If the VPN can't connect.
 [%collapsible]
 ====
 
-. https://youtube.com/channel/UCXJWKuGh0qedrYviGEJmlWw[Tom Spark's Reviews] on YouTube, or directly at his https://www.vpntierlist.com/[VPN Tier List] website.
-
-. https://restoreprivacy.com/vpn/best/[RestorePrivacy].
-
-. https://web.archive.org/web/20220929090559/https://thatoneprivacysite.xyz/choosing-the-best-vpn-for-you/[An archive of "That One Privacy Site"], dated 19th December 2019. +
-Use it as a second opinion on what justifies a good paid VPN provider.
-
-TIP: Kape Technologies owns many popular VPN review websites to unfairly promote their products as the "best": +
-https://restoreprivacy.com/kape-technologies-owns-expressvpn-cyberghost-pia-zenmate-vpn-review-sites/
-
-====
-
-
-== 3. Confirm the tethering is un-throttled
-
-TIP: After enabling USB tethering, enable "Data Saver". This tells Android to restrict data to USB tethering and what app is at the forefront only.
-
-. Disconnect from the VPN.
-. Use https://fast.com[Netflix's Speedtest], then after that's complete use https://www.waveform.com/tools/bufferbloat[Waveform's Bufferbloat Test]. +
-This will test for throttling of streaming servers (Netflix), various forms of data fingerprinting, and tethering/hotspot detections.
-. Connect to a VPN on the tethered-to (client) device, then repeat the above step.
-
-=== If the VPN can't connect:
 . Check if IPv4 or IPv6 is being used to reach the VPN server.
 ** For T-Mobile, connecting through IPv6 may be required.
 . If the VPN still can't connect, try each supported protocol in this order:
 ** WireGuard -> IKEv2/IPSec -> SoftEther -> OpenVPN (UDP, port 443) -> OpenVPN (TCP, port 443) -> OpenVPN over SSL (TCP, port 443)
 
-== 4. Getting better internet speeds
-. Search for "Roaming" in the Settings app, then disable Roaming.
-** Roaming to a different telecom usually means unavoidable throttling. Usually roaming only happens when signal strength is either very poor or non-existent from your telecom. +
-For example, T-Mobile USA's agreement with AT&T allow the usage of AT&T towers, but only up to 250kbps download & upload speeds is allowed while roaming on AT&T's network.
-. Use Network Signal Guru to set the allowed LTE bands to only the "LTE 4x4 Bands" listed on https://cacombos.com/device/G025E[cacombos.com] for your device.
+[.lead]
+Reasoning for each open-source VPN protocol choice:
 
+* *WireGuard*: fastest on reliable internet; easily blockable by DPI firewalls.
+* *IKEv2/IPSec*: sometimes faster than WireGuard on unreliable internet. Depending on the VPN provider, IKEv2 can either be resistant to DPI firewalls (hide.me's implementation), or not at all.
+* *SoftEther*: bypasses most DPI firewalls with good speeds in general, but is more complicated to set up for non-Windows OSes.
+* *OpenVPN3*: resistant to DPI firewalls if tls-crypt is used alongside port 443; China, Iran, and Egypt require OpenVPN over SSL which further reduce speeds. This protocol isn't efficient and has latency issues.
+
+___
+====
 
 
 == Appendices
@@ -288,6 +287,7 @@ Third-party scripts
 
 . `/jffs/scripts/wan-event` used for Asuswrt-Merlin is a refined version of https://www.snbforums.com/threads/wan-start-script-also-run-on-wan-stop.61295/#post-542636[this script].
 
+___
 ====
 
 *You've reached the end of this guide.* Star it if you liked it.
